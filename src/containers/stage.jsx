@@ -56,6 +56,8 @@ class Stage extends React.Component {
             question: null,
             hunger: 50, // 0 = not hungry, 100 = starving
             cleanliness: 100, // 0 = dirty, 100 = clean
+            happiness: 50, // 0 = sad, 100 = very happy
+            energy: 100, // 0 = tired, 100 = full energy
             petReactionMessage: "",
         };
         if (this.props.vm.renderer) {
@@ -460,17 +462,33 @@ class Stage extends React.Component {
             return {
                 hunger: newHunger,
                 cleanliness: newCleanliness,
-                petReactionMessage: "Yum! Thank you!",
+                petReactionMessage: "Yum! Thank you! 😋",
             };
         });
     }
     handlePlayWithPet() {
-        // Placeholder for play logic
-        console.log("Pet played with!");
+        this.setState((prevState) => {
+            const newHappiness = Math.min(100, prevState.happiness + 20);
+            const newHunger = Math.max(0, prevState.hunger - 5);
+            const newEnergy = Math.max(0, prevState.energy - 10);
+            setTimeout(this.clearPetReactionMessage, 1500);
+            return {
+                happiness: newHappiness,
+                hunger: newHunger,
+                energy: newEnergy,
+                petReactionMessage: "Yay! That was fun! 😺🎉",
+            };
+        });
     }
     handleCleanPet() {
-        // Placeholder for clean logic
-        console.log("Pet cleaned!");
+        this.setState((prevState) => {
+            const newCleanliness = Math.min(100, prevState.cleanliness + 30);
+            setTimeout(this.clearPetReactionMessage, 1500);
+            return {
+                cleanliness: newCleanliness,
+                petReactionMessage: "So fresh! 🛁✨",
+            };
+        });
     }
     render() {
         const {
@@ -491,6 +509,8 @@ class Stage extends React.Component {
                 onCleanPet={this.handleCleanPet}
                 hunger={this.state.hunger}
                 cleanliness={this.state.cleanliness}
+                happiness={this.state.happiness}
+                energy={this.state.energy}
                 petReactionMessage={this.state.petReactionMessage}
                 {...props}
             />
