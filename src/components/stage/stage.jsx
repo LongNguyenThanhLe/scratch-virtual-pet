@@ -52,6 +52,7 @@ const StageComponent = (props) => {
         onFoodClick,
         wasteItems,
         onWasteClick,
+        isSleeping,
         ...boxProps
     } = props;
 
@@ -99,10 +100,15 @@ const StageComponent = (props) => {
                                 left: `${food.x}px`,
                                 top: `${food.y}px`,
                                 transform: "translate(-50%, -50%)",
-                                cursor: "pointer",
+                                cursor: isSleeping ? "not-allowed" : "pointer",
                                 zIndex: 100,
+                                pointerEvents: isSleeping ? "none" : "auto",
                             }}
-                            onClick={() => onFoodClick(food.id)}
+                            onClick={
+                                isSleeping
+                                    ? undefined
+                                    : () => onFoodClick(food.id)
+                            }
                         >
                             <span className={styles.foodEmoji}>
                                 {foodEmojis[food.type]}
@@ -126,12 +132,18 @@ const StageComponent = (props) => {
                                     left: `${waste.x}px`,
                                     top: `${waste.y}px`,
                                     transform: "translate(-50%, -50%)",
-                                    cursor: "pointer",
+                                    cursor: isSleeping
+                                        ? "not-allowed"
+                                        : "pointer",
                                     zIndex: 101,
                                     fontSize: "2.2rem",
-                                    pointerEvents: "auto",
+                                    pointerEvents: isSleeping ? "none" : "auto",
                                 }}
-                                onClick={() => onWasteClick(waste.id)}
+                                onClick={
+                                    isSleeping
+                                        ? undefined
+                                        : () => onWasteClick(waste.id)
+                                }
                                 title="Click to clean!"
                             >
                                 <span role="img" aria-label="waste">
@@ -242,29 +254,40 @@ const StageComponent = (props) => {
                         <ButtonComponent
                             iconSrc={feedIcon}
                             onClick={onFeedPet}
-                            disabled={collectedFood <= 0}
+                            disabled={collectedFood <= 0 || isSleeping}
                         >
                             Feed ({collectedFood})
                         </ButtonComponent>
                         <ButtonComponent
                             iconSrc={playIcon}
                             onClick={onPlayWithPet}
+                            disabled={isSleeping}
                         >
                             Play
                         </ButtonComponent>
                         <ButtonComponent
                             iconSrc={cleanIcon}
                             onClick={onCleanPet}
+                            disabled={isSleeping}
                         >
                             Clean
                         </ButtonComponent>
                         <ButtonComponent
                             iconSrc={sleepIcon}
                             onClick={onSleepPet}
+                            disabled={isSleeping}
                         >
                             Sleep
                         </ButtonComponent>
                     </div>
+                    {isSleeping && (
+                        <div className={styles.sleepOverlay}>
+                            <span role="img" aria-label="sleeping">
+                                😴
+                            </span>{" "}
+                            Sleeping... Please wait
+                        </div>
+                    )}
                     <Box className={styles.monitorWrapper}>
                         <MonitorList
                             draggable={useEditorDragStyle}
@@ -369,6 +392,7 @@ StageComponent.propTypes = {
     onFoodClick: PropTypes.func,
     wasteItems: PropTypes.array,
     onWasteClick: PropTypes.func,
+    isSleeping: PropTypes.bool,
 };
 StageComponent.defaultProps = {
     dragRef: () => {},
