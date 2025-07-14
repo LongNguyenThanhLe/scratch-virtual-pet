@@ -128,6 +128,60 @@
     object-fit: contain;
 }
 
+/* Food Items */
+.foodItem {
+    font-size: 2rem;
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.foodItem:hover {
+    transform: translate(-50%, -50%) scale(1.2);
+    filter: drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.4));
+}
+
+.foodEmoji {
+    display: block;
+    animation: foodBounce 2s ease-in-out infinite;
+}
+
+.foodCounter {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 1rem;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+    z-index: 15;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 2px solid #4caf50;
+}
+
+.foodCounterLabel {
+    color: #666;
+}
+
+.foodCounterValue {
+    background: #4caf50;
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 0.5rem;
+    min-width: 1.5rem;
+    text-align: center;
+    font-weight: bold;
+}
+
+.foodCounterIcon {
+    font-size: 1.2rem;
+}
+
 .petButtonRow {
     position: absolute;
     bottom: 1.5rem;
@@ -169,6 +223,17 @@
     transition: transform 0.1s ease;
 }
 
+.petButtonRow > button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.petButtonRow > button:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
 /* Feed button animation */
 .petButtonRow > button:nth-child(1):hover {
     background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
@@ -203,7 +268,7 @@
 
 /* Clean button animation */
 .petButtonRow > button:nth-child(3):hover {
-    background: linear-gradient(135deg, #45b7d1, #96c93d);
+    background: linear-gradient(135deg, #81c784, #66bb6a);
     color: white;
 }
 
@@ -219,7 +284,7 @@
 
 /* Sleep button animation */
 .petButtonRow > button:nth-child(4):hover {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #9575cd, #7e57c2);
     color: white;
 }
 
@@ -233,37 +298,47 @@
     font-size: 1.5rem;
 }
 
-/* Button click ripple effect */
 .petButtonRow > button::before {
     content: "";
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.3s, height 0.3s;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    transition: left 0.5s;
 }
 
 .petButtonRow > button:active::before {
-    width: 100px;
-    height: 100px;
+    left: 100%;
 }
 
-/* Animation keyframes */
 @keyframes foodBounce {
-    0% {
-        transform: translateX(-50%) translateY(0) scale(0.5);
-        opacity: 0;
+    0%,
+    100% {
+        transform: translateY(0);
     }
     50% {
-        transform: translateX(-50%) translateY(-30px) scale(1.2);
+        transform: translateY(-8px);
+    }
+}
+
+@keyframes foodCollected {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
         opacity: 1;
     }
+    50% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 0.8;
+    }
     100% {
-        transform: translateX(-50%) translateY(-50px) scale(1);
+        transform: translate(-50%, -50%) scale(0);
         opacity: 0;
     }
 }
@@ -387,9 +462,6 @@
 
 .petSpeechBubble {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     background: #fff;
     border: 2px solid #333;
     border-radius: 15px;
@@ -454,10 +526,10 @@
 @keyframes speechBubblePop {
     0% {
         opacity: 0;
-        transform: translate(-50%, -50%) scale(0.8);
+        transform: scale(0.8);
     }
     100% {
         opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
+        transform: scale(1);
     }
 }
