@@ -45,6 +45,9 @@ class Stage extends React.Component {
             "handlePlayWithPet",
             "handleCleanPet",
             "clearPetReactionMessage",
+            "checkPetNeeds",
+            "clearPetSpeech",
+            "decayPetStats",
         ]);
         this.state = {
             mouseDownTimeoutId: null,
@@ -59,6 +62,8 @@ class Stage extends React.Component {
             happiness: 50, // 0 = sad, 100 = very happy
             energy: 100, // 0 = tired, 100 = full energy
             petReactionMessage: "",
+            petSpeechMessage: "",
+            petSpeechVisible: false,
         };
         if (this.props.vm.renderer) {
             this.renderer = this.props.vm.renderer;
@@ -84,6 +89,10 @@ class Stage extends React.Component {
         this.attachMouseEvents(this.canvas);
         this.updateRect();
         this.props.vm.runtime.addListener("QUESTION", this.questionListener);
+        // Start checking pet needs periodically
+        this.petNeedsInterval = setInterval(this.checkPetNeeds, 5000);
+        // Start pet stat decay timer
+        this.petDecayInterval = setInterval(this.decayPetStats, 10000);
     }
     shouldComponentUpdate(nextProps, nextState) {
         return (
@@ -93,7 +102,15 @@ class Stage extends React.Component {
             this.props.isFullScreen !== nextProps.isFullScreen ||
             this.state.question !== nextState.question ||
             this.props.micIndicator !== nextProps.micIndicator ||
-            this.props.isStarted !== nextProps.isStarted
+            this.props.isStarted !== nextProps.isStarted ||
+            // Pet-related state changes
+            this.state.hunger !== nextState.hunger ||
+            this.state.cleanliness !== nextState.cleanliness ||
+            this.state.happiness !== nextState.happiness ||
+            this.state.energy !== nextState.energy ||
+            this.state.petReactionMessage !== nextState.petReactionMessage ||
+            this.state.petSpeechMessage !== nextState.petSpeechMessage ||
+            this.state.petSpeechVisible !== nextState.petSpeechVisible
         );
     }
     componentDidUpdate(prevProps) {
@@ -110,6 +127,12 @@ class Stage extends React.Component {
         this.detachRectEvents();
         this.stopColorPickingLoop();
         this.props.vm.runtime.removeListener("QUESTION", this.questionListener);
+        if (this.petNeedsInterval) {
+            clearInterval(this.petNeedsInterval);
+        }
+        if (this.petDecayInterval) {
+            clearInterval(this.petDecayInterval);
+        }
     }
     questionListener(question) {
         this.setState({ question: question });
@@ -449,6 +472,71 @@ class Stage extends React.Component {
     setDragCanvas(canvas) {
         this.dragCanvas = canvas;
     }
+    checkPetNeeds() {
+        const { hunger, cleanliness, happiness, energy } = this.state;
+        let message = "";
+        let shouldShow = false;
+
+        if (hunger > 80) {
+            message = "I'm starving! 😫";
+            shouldShow = true;
+        } else if (hunger > 60) {
+            message = "I'm getting hungry... 🍽️";
+            shouldShow = true;
+        } else if (cleanliness < 30) {
+            message = "I feel so dirty! 🛁";
+            shouldShow = true;
+        } else if (cleanliness < 50) {
+            message = "I could use a bath... 🧼";
+            shouldShow = true;
+        } else if (happiness < 30) {
+            message = "I'm so sad... 😢";
+            shouldShow = true;
+        } else if (happiness < 50) {
+            message = "I'm feeling down... 😔";
+            shouldShow = true;
+        } else if (energy < 30) {
+            message = "I'm so tired... 😴";
+            shouldShow = true;
+        } else if (energy < 50) {
+            message = "I need some rest... 💤";
+            shouldShow = true;
+        }
+
+        if (shouldShow && !this.state.petSpeechVisible) {
+            this.setState({
+                petSpeechMessage: message,
+                petSpeechVisible: true,
+            });
+            // Clear speech after 3 seconds
+            setTimeout(this.clearPetSpeech, 3000);
+        }
+    }
+
+    clearPetSpeech() {
+        this.setState({
+            petSpeechVisible: false,
+            petSpeechMessage: "",
+        });
+    }
+
+    decayPetStats() {
+        this.setState((prevState) => {
+            // Gradual stat decreases - more realistic pet care simulation
+            const newHunger = Math.min(100, prevState.hunger + 3); // Gets hungrier
+            const newCleanliness = Math.max(0, prevState.cleanliness - 2); // Gets dirtier
+            const newHappiness = Math.max(0, prevState.happiness - 1); // Gets slightly sadder
+            const newEnergy = Math.max(0, prevState.energy - 1); // Gets slightly tired
+
+            return {
+                hunger: newHunger,
+                cleanliness: newCleanliness,
+                happiness: newHappiness,
+                energy: newEnergy,
+            };
+        });
+    }
+
     clearPetReactionMessage() {
         this.setState({ petReactionMessage: "" });
     }
@@ -457,7 +545,6 @@ class Stage extends React.Component {
         this.setState((prevState) => {
             const newHunger = Math.max(0, prevState.hunger - 20);
             const newCleanliness = Math.max(0, prevState.cleanliness - 5);
-            // Show pet reaction message
             setTimeout(this.clearPetReactionMessage, 1500);
             return {
                 hunger: newHunger,
@@ -466,6 +553,7 @@ class Stage extends React.Component {
             };
         });
     }
+
     handlePlayWithPet() {
         this.setState((prevState) => {
             const newHappiness = Math.min(100, prevState.happiness + 20);
@@ -480,6 +568,7 @@ class Stage extends React.Component {
             };
         });
     }
+
     handleCleanPet() {
         this.setState((prevState) => {
             const newCleanliness = Math.min(100, prevState.cleanliness + 30);
@@ -512,6 +601,8 @@ class Stage extends React.Component {
                 happiness={this.state.happiness}
                 energy={this.state.energy}
                 petReactionMessage={this.state.petReactionMessage}
+                petSpeechMessage={this.state.petSpeechMessage}
+                petSpeechVisible={this.state.petSpeechVisible}
                 {...props}
             />
         );

@@ -33,11 +33,16 @@ const StageComponent = (props) => {
         onDeactivateColorPicker,
         onDoubleClick,
         onQuestionAnswered,
+        onFeedPet,
+        onPlayWithPet,
+        onCleanPet,
         hunger,
         cleanliness,
-        petReactionMessage,
         happiness,
         energy,
+        petReactionMessage,
+        petSpeechMessage,
+        petSpeechVisible,
         ...boxProps
     } = props;
 
@@ -70,17 +75,85 @@ const StageComponent = (props) => {
                     />
                     {/* Pet Status Display */}
                     <div className={styles.petStatusRow}>
-                        <span>Hunger: {hunger}</span>
-                        <span>Cleanliness: {cleanliness}</span>
-                        <span>Happiness: {happiness}</span>
-                        <span className={styles.energyBarLabel}>Energy:</span>
-                        <div className={styles.energyBarWrapper}>
-                            <div
-                                className={styles.energyBar}
-                                style={{ width: `${energy}%` }}
-                            />
+                        <div className={styles.petMetric}>
+                            <span className={styles.metricLabel}>Hunger:</span>
+                            <div className={styles.metricBarWrapper}>
+                                <div
+                                    className={styles.metricBar}
+                                    style={{
+                                        width: `${hunger}%`,
+                                        backgroundColor:
+                                            hunger > 70
+                                                ? "#ff6b6b"
+                                                : hunger > 40
+                                                ? "#ffa726"
+                                                : "#4caf50",
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        <div className={styles.petMetric}>
+                            <span className={styles.metricLabel}>
+                                Cleanliness:
+                            </span>
+                            <div className={styles.metricBarWrapper}>
+                                <div
+                                    className={styles.metricBar}
+                                    style={{
+                                        width: `${cleanliness}%`,
+                                        backgroundColor:
+                                            cleanliness > 70
+                                                ? "#4caf50"
+                                                : cleanliness > 40
+                                                ? "#ffa726"
+                                                : "#ff6b6b",
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        <div className={styles.petMetric}>
+                            <span className={styles.metricLabel}>
+                                Happiness:
+                            </span>
+                            <div className={styles.metricBarWrapper}>
+                                <div
+                                    className={styles.metricBar}
+                                    style={{
+                                        width: `${happiness}%`,
+                                        backgroundColor:
+                                            happiness > 70
+                                                ? "#4caf50"
+                                                : happiness > 40
+                                                ? "#ffa726"
+                                                : "#ff6b6b",
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        <div className={styles.petMetric}>
+                            <span className={styles.metricLabel}>Energy:</span>
+                            <div className={styles.metricBarWrapper}>
+                                <div
+                                    className={styles.metricBar}
+                                    style={{
+                                        width: `${energy}%`,
+                                        backgroundColor:
+                                            energy > 70
+                                                ? "#4caf50"
+                                                : energy > 40
+                                                ? "#ffa726"
+                                                : "#ff6b6b",
+                                    }}
+                                />
+                            </div>
                         </div>
                     </div>
+                    {/* Pet Speech Bubble */}
+                    {petSpeechVisible && (
+                        <div className={styles.petSpeechBubble}>
+                            {petSpeechMessage}
+                        </div>
+                    )}
                     {/* Pet Reaction Message */}
                     {petReactionMessage && (
                         <div className={styles.petReactionMessage}>
@@ -89,21 +162,18 @@ const StageComponent = (props) => {
                     )}
                     {/* Pet Interaction Buttons */}
                     <div className={styles.petButtonRow}>
-                        <ButtonComponent
-                            iconSrc={feedIcon}
-                            onClick={props.onFeedPet}
-                        >
+                        <ButtonComponent iconSrc={feedIcon} onClick={onFeedPet}>
                             Feed
                         </ButtonComponent>
                         <ButtonComponent
                             iconSrc={playIcon}
-                            onClick={props.onPlayWithPet}
+                            onClick={onPlayWithPet}
                         >
                             Play
                         </ButtonComponent>
                         <ButtonComponent
                             iconSrc={cleanIcon}
-                            onClick={props.onCleanPet}
+                            onClick={onCleanPet}
                         >
                             Clean
                         </ButtonComponent>
