@@ -159,15 +159,45 @@
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 2rem;
-    background: rgba(255, 255, 255, 0.85);
-    border-radius: 1.5rem;
-    padding: 0.4rem 1.2rem;
-    font-size: 1.1rem;
+    flex-direction: column;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 1rem;
+    padding: 0.8rem 1.2rem;
+    font-size: 0.9rem;
     font-weight: 500;
     z-index: 12;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    min-width: 280px;
+}
+
+.petMetric {
+    display: flex;
     align-items: center;
+    gap: 0.5rem;
+}
+
+.metricLabel {
+    min-width: 80px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.metricBarWrapper {
+    flex: 1;
+    height: 12px;
+    background: #f0f0f0;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+}
+
+.metricBar {
+    height: 100%;
+    border-radius: 6px 0 0 6px;
+    transition: width 0.3s ease, background-color 0.3s ease;
+    min-width: 4px;
 }
 
 .petReactionMessage {
@@ -185,32 +215,6 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     opacity: 1;
     animation: petReactionFade 1.5s linear forwards;
-}
-
-.energyBarWrapper {
-    width: 80px;
-    height: 16px;
-    background: #eee;
-    border-radius: 8px;
-    margin-left: 0.5rem;
-    margin-right: 0.5rem;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    border: 1px solid #ccc;
-}
-
-.energyBar {
-    height: 100%;
-    background: linear-gradient(90deg, #81c784 0%, #388e3c 100%);
-    border-radius: 8px 0 0 8px;
-    transition: width 0.3s;
-}
-
-.energyBarLabel {
-    font-size: 1rem;
-    font-weight: 500;
-    margin-left: 1rem;
 }
 
 @keyframes flash {
