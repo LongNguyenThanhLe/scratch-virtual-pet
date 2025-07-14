@@ -573,3 +573,11 @@
     pointer-events: all;
     text-shadow: 0 2px 8px #000;
 }
+
+.sleepCountdown {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-top: 1rem;
+    color: #ffe082;
+    text-shadow: 0 2px 8px #000;
+}

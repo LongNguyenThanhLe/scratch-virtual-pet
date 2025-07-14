@@ -77,6 +77,7 @@ class Stage extends React.Component {
             collectedFood: 0, // Number of food items collected
             wasteItems: [], // Array of waste items (animal waste)
             isSleeping: false,
+            sleepCountdown: 0,
         };
         if (this.props.vm.renderer) {
             this.renderer = this.props.vm.renderer;
@@ -170,6 +171,9 @@ class Stage extends React.Component {
         }
         if (this.wasteSpawnInterval) {
             clearInterval(this.wasteSpawnInterval);
+        }
+        if (this.sleepInterval) {
+            clearInterval(this.sleepInterval);
         }
     }
     questionListener(question) {
@@ -776,7 +780,7 @@ class Stage extends React.Component {
 
     handleSleepPet() {
         if (this.state.isSleeping) return;
-        this.setState({ isSleeping: true });
+        this.setState({ isSleeping: true, sleepCountdown: 30 });
         this.setState((prevState) => {
             const newEnergy = Math.min(100, prevState.energy + 30);
             const newHunger = Math.max(0, prevState.hunger - 5);
@@ -787,9 +791,16 @@ class Stage extends React.Component {
                 petReactionMessage: "Zzz... 💤",
             };
         });
-        setTimeout(() => {
-            this.setState({ isSleeping: false });
-        }, 30000);
+        // Start countdown interval
+        this.sleepInterval = setInterval(() => {
+            this.setState((prevState) => {
+                if (prevState.sleepCountdown <= 1) {
+                    clearInterval(this.sleepInterval);
+                    return { isSleeping: false, sleepCountdown: 0 };
+                }
+                return { sleepCountdown: prevState.sleepCountdown - 1 };
+            });
+        }, 1000);
     }
     render() {
         const {
@@ -824,6 +835,7 @@ class Stage extends React.Component {
                 wasteItems={this.state.wasteItems}
                 onWasteClick={this.handleWasteClick}
                 isSleeping={this.state.isSleeping}
+                sleepCountdown={this.state.sleepCountdown}
                 {...props}
             />
         );

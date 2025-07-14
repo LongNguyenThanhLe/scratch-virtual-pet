@@ -53,6 +53,7 @@ const StageComponent = (props) => {
         wasteItems,
         onWasteClick,
         isSleeping,
+        sleepCountdown,
         ...boxProps
     } = props;
 
@@ -286,6 +287,9 @@ const StageComponent = (props) => {
                                 😴
                             </span>{" "}
                             Sleeping... Please wait
+                            <div className={styles.sleepCountdown}>
+                                ({sleepCountdown})
+                            </div>
                         </div>
                     )}
                     <Box className={styles.monitorWrapper}>
@@ -393,6 +397,7 @@ StageComponent.propTypes = {
     wasteItems: PropTypes.array,
     onWasteClick: PropTypes.func,
     isSleeping: PropTypes.bool,
+    sleepCountdown: PropTypes.number,
 };
 StageComponent.defaultProps = {
     dragRef: () => {},
