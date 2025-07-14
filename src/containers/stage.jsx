@@ -282,9 +282,6 @@ class Stage extends React.Component {
     }
     handleFoodClick(foodId) {
         this.collectFood(foodId);
-        this.setState((prevState) => ({
-            collectedFood: prevState.collectedFood + 1,
-        }));
     }
     spawnWaste = () => {
         // Only one waste at a time for simplicity
