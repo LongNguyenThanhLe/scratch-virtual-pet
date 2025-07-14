@@ -14,6 +14,7 @@ import ButtonComponent from "../button/button.jsx";
 import feedIcon from "./icon--feed.svg";
 import playIcon from "./icon--play.svg";
 import cleanIcon from "./icon--clean.svg";
+import sleepIcon from "./icon--sleep.svg";
 import { STAGE_DISPLAY_SIZES } from "../../lib/layout-constants.js";
 import { getStageDimensions } from "../../lib/screen-utils.js";
 import styles from "./stage.css";
@@ -36,6 +37,7 @@ const StageComponent = (props) => {
         onFeedPet,
         onPlayWithPet,
         onCleanPet,
+        onSleepPet,
         hunger,
         cleanliness,
         happiness,
@@ -176,6 +178,12 @@ const StageComponent = (props) => {
                             onClick={onCleanPet}
                         >
                             Clean
+                        </ButtonComponent>
+                        <ButtonComponent
+                            iconSrc={sleepIcon}
+                            onClick={onSleepPet}
+                        >
+                            Sleep
                         </ButtonComponent>
                     </div>
                     <Box className={styles.monitorWrapper}>

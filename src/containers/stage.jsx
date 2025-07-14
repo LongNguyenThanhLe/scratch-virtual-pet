@@ -44,6 +44,7 @@ class Stage extends React.Component {
             "handleFeedPet",
             "handlePlayWithPet",
             "handleCleanPet",
+            "handleSleepPet",
             "clearPetReactionMessage",
             "checkPetNeeds",
             "clearPetSpeech",
@@ -579,6 +580,19 @@ class Stage extends React.Component {
             };
         });
     }
+
+    handleSleepPet() {
+        this.setState((prevState) => {
+            const newEnergy = Math.min(100, prevState.energy + 30);
+            const newHunger = Math.max(0, prevState.hunger - 5);
+            setTimeout(this.clearPetReactionMessage, 1500);
+            return {
+                energy: newEnergy,
+                hunger: newHunger,
+                petReactionMessage: "Zzz... 💤",
+            };
+        });
+    }
     render() {
         const {
             vm, // eslint-disable-line no-unused-vars
@@ -596,6 +610,7 @@ class Stage extends React.Component {
                 onFeedPet={this.handleFeedPet}
                 onPlayWithPet={this.handlePlayWithPet}
                 onCleanPet={this.handleCleanPet}
+                onSleepPet={this.handleSleepPet}
                 hunger={this.state.hunger}
                 cleanliness={this.state.cleanliness}
                 happiness={this.state.happiness}
