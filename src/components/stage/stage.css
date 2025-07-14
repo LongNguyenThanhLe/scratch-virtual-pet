@@ -3,36 +3,23 @@
 @import "../../css/z-index.css";
 
 .stage {
-    /*
-        Fixes a few extra pixels of margin/padding, that adds on to the bottom
-        of the element, which messes up the chrome padding consistency
-    */
     display: block;
-
-    border-radius: $space;
-    border: $stage-standard-border-width solid $ui-black-transparent;
+    border-radius: 8px;
+    border: 2px solid rgba(0, 0, 0, 0.15);
     overflow: hidden;
-
-    /* @todo: This is for overriding the value being set somewhere. Where is it being set? */
     background-color: transparent;
-
-    /* Allow custom touch handling to prevent scrolling on Edge */
     touch-action: none;
-
-    /* Make sure border is not included in size calculation */
     box-sizing: content-box !important;
-
-    /* enforce overflow + reset position of absolutely-positioned children */
     position: relative;
 }
 
 .stage.full-screen {
-    border: $stage-full-screen-border-width solid rgb(126, 133, 151);
+    border: 4px solid rgb(126, 133, 151);
 }
 
 .with-color-picker {
     cursor: none;
-    z-index: $z-index-stage-with-color-picker;
+    z-index: 1002;
 }
 
 .color-picker-background {
@@ -41,7 +28,7 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.55);
     display: block;
-    z-index: $z-index-stage-color-picker-background;
+    z-index: 1001;
     top: 0;
     left: 0;
 }
@@ -50,21 +37,16 @@
     position: relative;
 }
 
-/* we want stage overlays to all be positioned in the same spot as the stage, but can't put them inside the border
-because we want their overflow to be visible, and the bordered element must have overflow: hidden set so that the
-stage doesn't "spill" out from under its rounded corners. instead, shift these over by the border width. */
 .stage-overlays {
     position: absolute;
-    top: $stage-standard-border-width;
-    left: $stage-standard-border-width;
-
-    /* the overlay itself should not capture pointer events; only its child elements can do that */
+    top: 2px;
+    left: 2px;
     pointer-events: none;
 }
 
 .stage-overlays.full-screen {
-    top: $stage-full-screen-border-width;
-    left: $stage-full-screen-border-width;
+    top: 4px;
+    left: 4px;
 }
 
 .monitor-wrapper,
@@ -80,8 +62,8 @@ stage doesn't "spill" out from under its rounded corners. instead, shift these o
     position: absolute;
     top: 0;
     left: 0;
-    z-index: $z-index-dragging-sprite;
-    filter: drop-shadow(5px 5px 5px $ui-black-transparent);
+    z-index: 1003;
+    filter: drop-shadow(5px 5px 5px rgba(0, 0, 0, 0.15));
 }
 
 .stage-bottom-wrapper {
@@ -97,23 +79,23 @@ stage doesn't "spill" out from under its rounded corners. instead, shift these o
 
 .mic-indicator {
     transform-origin: bottom right;
-    z-index: $z-index-stage-indicator;
+    z-index: 1004;
     pointer-events: none;
     align-self: flex-end;
 }
 
 .question-wrapper {
-    z-index: $z-index-stage-question;
+    z-index: 1005;
     pointer-events: auto;
 }
 
 .frame {
-    background: $looks-transparent;
-    border: 2px solid $looks-secondary;
+    background: rgba(0, 0, 0, 0.05);
+    border: 2px solid #b3b3b3;
     border-radius: 0.5rem;
     animation-name: flash;
     animation-duration: 0.75s;
-    animation-fill-mode: forwards; /* Leave at 0 opacity after animation */
+    animation-fill-mode: forwards;
 }
 
 .green-flag-overlay-wrapper {
@@ -132,7 +114,7 @@ stage doesn't "spill" out from under its rounded corners. instead, shift these o
     padding: 1rem;
     border-radius: 100%;
     background: rgba(255, 255, 255, 0.75);
-    border: 3px solid $ui-white;
+    border: 3px solid #fff;
     display: flex;
     justify-content: center;
     align-items: center;
