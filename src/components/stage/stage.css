@@ -533,3 +533,24 @@
         transform: scale(1);
     }
 }
+
+.foodFading {
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+.wasteItem {
+    font-size: 2.2rem;
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.25));
+    user-select: none;
+    transition: opacity 0.5s, transform 0.2s;
+    opacity: 1;
+    pointer-events: auto;
+}
+.wasteItem:hover {
+    transform: translate(-50%, -50%) scale(1.15) rotate(-10deg);
+    filter: drop-shadow(3px 3px 8px rgba(0, 0, 0, 0.35));
+}
+.wasteFading {
+    opacity: 0;
+}
