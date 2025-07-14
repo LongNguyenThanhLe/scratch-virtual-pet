@@ -109,8 +109,8 @@ class Stage extends React.Component {
         this.petNeedsInterval = setInterval(this.checkPetNeeds, 5000);
         // Start pet stat decay timer
         this.petDecayInterval = setInterval(this.decayPetStats, 10000);
-        // Start food spawning timer (now every 30 seconds)
-        this.foodSpawnInterval = setInterval(this.spawnFood, 30000);
+        // Start food spawning timer (now every 20 seconds)
+        this.foodSpawnInterval = setInterval(this.spawnFood, 20000);
         // Start waste spawning timer (every 3 minutes)
         this.wasteSpawnInterval = setInterval(this.spawnWaste, 180000);
     }
@@ -230,7 +230,7 @@ class Stage extends React.Component {
                 collected: false,
                 fading: false,
             };
-            // Set a timeout to fade out and remove the food after 3 seconds if not collected
+            // Set a timeout to fade out and remove the food after 5 seconds if not collected
             setTimeout(() => {
                 this.setState((prevState2) => {
                     const food = prevState2.foodItems.find(
@@ -253,7 +253,7 @@ class Stage extends React.Component {
                     }
                     return null;
                 });
-            }, 3000);
+            }, 5000);
             return {
                 foodItems: [...prevState.foodItems, newFood],
             };
