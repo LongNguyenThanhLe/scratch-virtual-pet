@@ -50,6 +50,8 @@ const StageComponent = (props) => {
         foodItems,
         collectedFood,
         onFoodClick,
+        wasteItems,
+        onWasteClick,
         ...boxProps
     } = props;
 
@@ -107,6 +109,36 @@ const StageComponent = (props) => {
                             </span>
                         </div>
                     ))}
+
+                    {/* Waste Items */}
+                    {wasteItems &&
+                        wasteItems.map((waste) => (
+                            <div
+                                key={waste.id}
+                                className={
+                                    styles.wasteItem +
+                                    (waste.fading
+                                        ? " " + styles.wasteFading
+                                        : "")
+                                }
+                                style={{
+                                    position: "absolute",
+                                    left: `${waste.x}px`,
+                                    top: `${waste.y}px`,
+                                    transform: "translate(-50%, -50%)",
+                                    cursor: "pointer",
+                                    zIndex: 101,
+                                    fontSize: "2.2rem",
+                                    pointerEvents: "auto",
+                                }}
+                                onClick={() => onWasteClick(waste.id)}
+                                title="Click to clean!"
+                            >
+                                <span role="img" aria-label="waste">
+                                    💩
+                                </span>
+                            </div>
+                        ))}
 
                     {/* Pet Status Display */}
                     <div className={styles.petStatusRow}>
@@ -335,6 +367,8 @@ StageComponent.propTypes = {
     foodItems: PropTypes.array,
     collectedFood: PropTypes.number,
     onFoodClick: PropTypes.func,
+    wasteItems: PropTypes.array,
+    onWasteClick: PropTypes.func,
 };
 StageComponent.defaultProps = {
     dragRef: () => {},

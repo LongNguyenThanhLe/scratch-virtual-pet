@@ -53,6 +53,8 @@ class Stage extends React.Component {
             "spawnFood",
             "collectFood",
             "handleFoodClick",
+            "spawnWaste",
+            "handleWasteClick",
         ]);
         this.state = {
             mouseDownTimeoutId: null,
@@ -73,6 +75,7 @@ class Stage extends React.Component {
             petY: 0, // Pet's y coordinate
             foodItems: [], // Array of food items in the field
             collectedFood: 0, // Number of food items collected
+            wasteItems: [], // Array of waste items (animal waste)
         };
         if (this.props.vm.renderer) {
             this.renderer = this.props.vm.renderer;
@@ -108,6 +111,8 @@ class Stage extends React.Component {
         this.petDecayInterval = setInterval(this.decayPetStats, 10000);
         // Start food spawning timer (now every 30 seconds)
         this.foodSpawnInterval = setInterval(this.spawnFood, 30000);
+        // Start waste spawning timer (every 3 minutes)
+        this.wasteSpawnInterval = setInterval(this.spawnWaste, 180000);
     }
     shouldComponentUpdate(nextProps, nextState) {
         return (
@@ -130,7 +135,9 @@ class Stage extends React.Component {
             this.state.petY !== nextState.petY ||
             // Food-related state changes
             this.state.foodItems !== nextState.foodItems ||
-            this.state.collectedFood !== nextState.collectedFood
+            this.state.collectedFood !== nextState.collectedFood ||
+            // Waste-related state changes
+            this.state.wasteItems !== nextState.wasteItems
         );
     }
     componentDidUpdate(prevProps) {
@@ -159,6 +166,9 @@ class Stage extends React.Component {
         }
         if (this.foodSpawnInterval) {
             clearInterval(this.foodSpawnInterval);
+        }
+        if (this.wasteSpawnInterval) {
+            clearInterval(this.wasteSpawnInterval);
         }
     }
     questionListener(question) {
@@ -276,6 +286,40 @@ class Stage extends React.Component {
             collectedFood: prevState.collectedFood + 1,
         }));
     }
+    spawnWaste = () => {
+        // Only one waste at a time for simplicity
+        if (this.state.wasteItems.length > 0) return;
+        const stageWidth = this.rect ? this.rect.width : 480;
+        const stageHeight = this.rect ? this.rect.height : 360;
+        const newWaste = {
+            id: Date.now() + Math.random(),
+            x: Math.random() * (stageWidth - 40) + 20,
+            y: Math.random() * (stageHeight - 40) + 20,
+            fading: false,
+        };
+        this.setState((prevState) => ({
+            wasteItems: [...prevState.wasteItems, newWaste],
+        }));
+    };
+
+    handleWasteClick = (wasteId) => {
+        // Animate fade out, then remove
+        this.setState((prevState) => ({
+            wasteItems: prevState.wasteItems.map((w) =>
+                w.id === wasteId ? { ...w, fading: true } : w
+            ),
+        }));
+        setTimeout(() => {
+            this.setState((prevState) => ({
+                wasteItems: prevState.wasteItems.filter(
+                    (w) => w.id !== wasteId
+                ),
+            }));
+        }, 500);
+        // Optionally show a cleaning message
+        this.setState({ petReactionMessage: "Thanks for cleaning! ✨" });
+        setTimeout(this.clearPetReactionMessage, 1500);
+    };
     startColorPickingLoop() {
         this.intervalId = setInterval(() => {
             if (typeof this.pickX === "number") {
@@ -657,8 +701,13 @@ class Stage extends React.Component {
     decayPetStats() {
         this.setState((prevState) => {
             // Gradual stat decreases - more realistic pet care simulation
+            const wastePresent = prevState.wasteItems.length > 0;
+            const cleanlinessDecay = wastePresent ? 10 : 2;
             const newHunger = Math.min(100, prevState.hunger + 3); // Gets hungrier
-            const newCleanliness = Math.max(0, prevState.cleanliness - 2); // Gets dirtier
+            const newCleanliness = Math.max(
+                0,
+                prevState.cleanliness - cleanlinessDecay
+            ); // Gets dirtier faster if waste
             const newHappiness = Math.max(0, prevState.happiness - 1); // Gets slightly sadder
             const newEnergy = Math.max(0, prevState.energy - 1); // Gets slightly tired
 
@@ -764,6 +813,8 @@ class Stage extends React.Component {
                 foodItems={this.state.foodItems}
                 collectedFood={this.state.collectedFood}
                 onFoodClick={this.handleFoodClick}
+                wasteItems={this.state.wasteItems}
+                onWasteClick={this.handleWasteClick}
                 {...props}
             />
         );
