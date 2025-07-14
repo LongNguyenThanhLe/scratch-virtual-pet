@@ -128,6 +128,60 @@
     object-fit: contain;
 }
 
+/* Food Items */
+.foodItem {
+    font-size: 2rem;
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.foodItem:hover {
+    transform: translate(-50%, -50%) scale(1.2);
+    filter: drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.4));
+}
+
+.foodEmoji {
+    display: block;
+    animation: foodBounce 2s ease-in-out infinite;
+}
+
+.foodCounter {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 1rem;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+    z-index: 15;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 2px solid #4caf50;
+}
+
+.foodCounterLabel {
+    color: #666;
+}
+
+.foodCounterValue {
+    background: #4caf50;
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 0.5rem;
+    min-width: 1.5rem;
+    text-align: center;
+    font-weight: bold;
+}
+
+.foodCounterIcon {
+    font-size: 1.2rem;
+}
+
 .petButtonRow {
     position: absolute;
     bottom: 1.5rem;
@@ -151,6 +205,195 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.petButtonRow > button {
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.petButtonRow > button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.petButtonRow > button:active {
+    transform: translateY(0px);
+    transition: transform 0.1s ease;
+}
+
+.petButtonRow > button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.petButtonRow > button:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* Feed button animation */
+.petButtonRow > button:nth-child(1):hover {
+    background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+    color: white;
+}
+
+.petButtonRow > button:nth-child(1):active::after {
+    content: "🍽️";
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: foodBounce 0.6s ease-out;
+    font-size: 1.5rem;
+}
+
+/* Play button animation */
+.petButtonRow > button:nth-child(2):hover {
+    background: linear-gradient(135deg, #4ecdc4, #44a08d);
+    color: white;
+}
+
+.petButtonRow > button:nth-child(2):active::after {
+    content: "🎉";
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: playBounce 0.6s ease-out;
+    font-size: 1.5rem;
+}
+
+/* Clean button animation */
+.petButtonRow > button:nth-child(3):hover {
+    background: linear-gradient(135deg, #81c784, #66bb6a);
+    color: white;
+}
+
+.petButtonRow > button:nth-child(3):active::after {
+    content: "✨";
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: cleanSparkle 0.6s ease-out;
+    font-size: 1.5rem;
+}
+
+/* Sleep button animation */
+.petButtonRow > button:nth-child(4):hover {
+    background: linear-gradient(135deg, #9575cd, #7e57c2);
+    color: white;
+}
+
+.petButtonRow > button:nth-child(4):active::after {
+    content: "💤";
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: sleepFloat 0.6s ease-out;
+    font-size: 1.5rem;
+}
+
+.petButtonRow > button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    transition: left 0.5s;
+}
+
+.petButtonRow > button:active::before {
+    left: 100%;
+}
+
+@keyframes foodBounce {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+@keyframes foodCollected {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
+}
+
+@keyframes playBounce {
+    0% {
+        transform: translateX(-50%) translateY(0) scale(0.5);
+        opacity: 0;
+    }
+    25% {
+        transform: translateX(-50%) translateY(-20px) scale(1.1);
+        opacity: 1;
+    }
+    50% {
+        transform: translateX(-50%) translateY(-40px) scale(0.9);
+        opacity: 1;
+    }
+    75% {
+        transform: translateX(-50%) translateY(-30px) scale(1.1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(-50%) translateY(-60px) scale(1);
+        opacity: 0;
+    }
+}
+
+@keyframes cleanSparkle {
+    0% {
+        transform: translateX(-50%) translateY(0) scale(0.5) rotate(0deg);
+        opacity: 0;
+    }
+    50% {
+        transform: translateX(-50%) translateY(-25px) scale(1.2) rotate(180deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(-50%) translateY(-50px) scale(1) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+@keyframes sleepFloat {
+    0% {
+        transform: translateX(-50%) translateY(0) scale(0.5);
+        opacity: 0;
+    }
+    50% {
+        transform: translateX(-50%) translateY(-20px) scale(1.1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(-50%) translateY(-40px) scale(1);
+        opacity: 0;
+    }
 }
 
 .petStatusRow {
@@ -219,9 +462,6 @@
 
 .petSpeechBubble {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     background: #fff;
     border: 2px solid #333;
     border-radius: 15px;
@@ -286,10 +526,10 @@
 @keyframes speechBubblePop {
     0% {
         opacity: 0;
-        transform: translate(-50%, -50%) scale(0.8);
+        transform: scale(0.8);
     }
     100% {
         opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
+        transform: scale(1);
     }
 }

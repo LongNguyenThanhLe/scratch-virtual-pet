@@ -14,6 +14,7 @@ import ButtonComponent from "../button/button.jsx";
 import feedIcon from "./icon--feed.svg";
 import playIcon from "./icon--play.svg";
 import cleanIcon from "./icon--clean.svg";
+import sleepIcon from "./icon--sleep.svg";
 import { STAGE_DISPLAY_SIZES } from "../../lib/layout-constants.js";
 import { getStageDimensions } from "../../lib/screen-utils.js";
 import styles from "./stage.css";
@@ -36,6 +37,7 @@ const StageComponent = (props) => {
         onFeedPet,
         onPlayWithPet,
         onCleanPet,
+        onSleepPet,
         hunger,
         cleanliness,
         happiness,
@@ -43,10 +45,18 @@ const StageComponent = (props) => {
         petReactionMessage,
         petSpeechMessage,
         petSpeechVisible,
+        petX,
+        petY,
+        foodItems,
+        collectedFood,
+        onFoodClick,
         ...boxProps
     } = props;
 
     const stageDimensions = getStageDimensions(stageSize, isFullScreen);
+
+    // Food type emojis
+    const foodEmojis = ["🍎", "🦴", "🐟"];
 
     return (
         <React.Fragment>
@@ -73,6 +83,31 @@ const StageComponent = (props) => {
                         }}
                         {...boxProps}
                     />
+
+                    {/* Food Items */}
+                    {foodItems.map((food) => (
+                        <div
+                            key={food.id}
+                            className={styles.foodItem}
+                            style={{
+                                position: "absolute",
+                                left: `${food.x}px`,
+                                top: `${food.y}px`,
+                                transform: "translate(-50%, -50%)",
+                                cursor: "pointer",
+                                zIndex: 100,
+                                animation: food.collected
+                                    ? styles.foodCollected
+                                    : styles.foodBounce,
+                            }}
+                            onClick={() => onFoodClick(food.id)}
+                        >
+                            <span className={styles.foodEmoji}>
+                                {foodEmojis[food.type]}
+                            </span>
+                        </div>
+                    ))}
+
                     {/* Pet Status Display */}
                     <div className={styles.petStatusRow}>
                         <div className={styles.petMetric}>
@@ -148,9 +183,30 @@ const StageComponent = (props) => {
                             </div>
                         </div>
                     </div>
+
+                    {/* Collected Food Counter */}
+                    <div className={styles.foodCounter}>
+                        <span className={styles.foodCounterLabel}>
+                            Food Collected:
+                        </span>
+                        <span className={styles.foodCounterValue}>
+                            {collectedFood}
+                        </span>
+                        <span className={styles.foodCounterIcon}>🍽️</span>
+                    </div>
+
                     {/* Pet Speech Bubble */}
                     {petSpeechVisible && (
-                        <div className={styles.petSpeechBubble}>
+                        <div
+                            className={styles.petSpeechBubble}
+                            style={{
+                                position: "absolute",
+                                left: `${petX}px`,
+                                top: `${petY - 60}px`,
+                                transform: "translateX(-50%)",
+                                zIndex: 1000,
+                            }}
+                        >
                             {petSpeechMessage}
                         </div>
                     )}
@@ -162,8 +218,12 @@ const StageComponent = (props) => {
                     )}
                     {/* Pet Interaction Buttons */}
                     <div className={styles.petButtonRow}>
-                        <ButtonComponent iconSrc={feedIcon} onClick={onFeedPet}>
-                            Feed
+                        <ButtonComponent
+                            iconSrc={feedIcon}
+                            onClick={onFeedPet}
+                            disabled={collectedFood <= 0}
+                        >
+                            Feed ({collectedFood})
                         </ButtonComponent>
                         <ButtonComponent
                             iconSrc={playIcon}
@@ -176,6 +236,12 @@ const StageComponent = (props) => {
                             onClick={onCleanPet}
                         >
                             Clean
+                        </ButtonComponent>
+                        <ButtonComponent
+                            iconSrc={sleepIcon}
+                            onClick={onSleepPet}
+                        >
+                            Sleep
                         </ButtonComponent>
                     </div>
                     <Box className={styles.monitorWrapper}>
@@ -264,6 +330,22 @@ StageComponent.propTypes = {
     question: PropTypes.string,
     stageSize: PropTypes.oneOf(Object.keys(STAGE_DISPLAY_SIZES)).isRequired,
     useEditorDragStyle: PropTypes.bool,
+    onFeedPet: PropTypes.func,
+    onPlayWithPet: PropTypes.func,
+    onCleanPet: PropTypes.func,
+    onSleepPet: PropTypes.func,
+    hunger: PropTypes.number,
+    cleanliness: PropTypes.number,
+    happiness: PropTypes.number,
+    energy: PropTypes.number,
+    petReactionMessage: PropTypes.string,
+    petSpeechMessage: PropTypes.string,
+    petSpeechVisible: PropTypes.bool,
+    petX: PropTypes.number,
+    petY: PropTypes.number,
+    foodItems: PropTypes.array,
+    collectedFood: PropTypes.number,
+    onFoodClick: PropTypes.func,
 };
 StageComponent.defaultProps = {
     dragRef: () => {},

@@ -44,10 +44,15 @@ class Stage extends React.Component {
             "handleFeedPet",
             "handlePlayWithPet",
             "handleCleanPet",
+            "handleSleepPet",
             "clearPetReactionMessage",
             "checkPetNeeds",
             "clearPetSpeech",
             "decayPetStats",
+            "handleTargetsUpdate",
+            "spawnFood",
+            "collectFood",
+            "handleFoodClick",
         ]);
         this.state = {
             mouseDownTimeoutId: null,
@@ -64,6 +69,10 @@ class Stage extends React.Component {
             petReactionMessage: "",
             petSpeechMessage: "",
             petSpeechVisible: false,
+            petX: 0, // Pet's x coordinate
+            petY: 0, // Pet's y coordinate
+            foodItems: [], // Array of food items in the field
+            collectedFood: 0, // Number of food items collected
         };
         if (this.props.vm.renderer) {
             this.renderer = this.props.vm.renderer;
@@ -89,10 +98,16 @@ class Stage extends React.Component {
         this.attachMouseEvents(this.canvas);
         this.updateRect();
         this.props.vm.runtime.addListener("QUESTION", this.questionListener);
+        this.props.vm.runtime.addListener(
+            "targetsUpdate",
+            this.handleTargetsUpdate
+        );
         // Start checking pet needs periodically
         this.petNeedsInterval = setInterval(this.checkPetNeeds, 5000);
         // Start pet stat decay timer
         this.petDecayInterval = setInterval(this.decayPetStats, 10000);
+        // Start food spawning timer
+        this.foodSpawnInterval = setInterval(this.spawnFood, 8000);
     }
     shouldComponentUpdate(nextProps, nextState) {
         return (
@@ -110,7 +125,12 @@ class Stage extends React.Component {
             this.state.energy !== nextState.energy ||
             this.state.petReactionMessage !== nextState.petReactionMessage ||
             this.state.petSpeechMessage !== nextState.petSpeechMessage ||
-            this.state.petSpeechVisible !== nextState.petSpeechVisible
+            this.state.petSpeechVisible !== nextState.petSpeechVisible ||
+            this.state.petX !== nextState.petX ||
+            this.state.petY !== nextState.petY ||
+            // Food-related state changes
+            this.state.foodItems !== nextState.foodItems ||
+            this.state.collectedFood !== nextState.collectedFood
         );
     }
     componentDidUpdate(prevProps) {
@@ -127,11 +147,18 @@ class Stage extends React.Component {
         this.detachRectEvents();
         this.stopColorPickingLoop();
         this.props.vm.runtime.removeListener("QUESTION", this.questionListener);
+        this.props.vm.runtime.removeListener(
+            "targetsUpdate",
+            this.handleTargetsUpdate
+        );
         if (this.petNeedsInterval) {
             clearInterval(this.petNeedsInterval);
         }
         if (this.petDecayInterval) {
             clearInterval(this.petDecayInterval);
+        }
+        if (this.foodSpawnInterval) {
+            clearInterval(this.foodSpawnInterval);
         }
     }
     questionListener(question) {
@@ -141,6 +168,91 @@ class Stage extends React.Component {
         this.setState({ question: null }, () => {
             this.props.vm.runtime.emit("ANSWER", answer);
         });
+    }
+    handleTargetsUpdate() {
+        // Get the pet sprite's current position
+        const targets = this.props.vm.runtime.targets;
+        const petTarget = targets.find(
+            (target) =>
+                (target.name && target.name.toLowerCase().includes("pet")) ||
+                target.id === this.props.vm.editingTarget
+        );
+
+        if (petTarget) {
+            // Convert Scratch coordinates to screen coordinates for the speech bubble
+            const nativeSize = this.renderer.getNativeSize();
+            const screenX =
+                (petTarget.x / nativeSize[0]) * this.rect.width +
+                this.rect.width / 2;
+            const screenY =
+                -(petTarget.y / nativeSize[1]) * this.rect.height +
+                this.rect.height / 2;
+
+            this.setState({
+                petX: screenX,
+                petY: screenY,
+            });
+
+            // Also affect pet stats when it moves (from Scratch blocks)
+            this.setState((prevState) => ({
+                energy: Math.max(0, prevState.energy - Math.random() * 2),
+                cleanliness: Math.max(
+                    0,
+                    prevState.cleanliness - Math.random() * 1
+                ),
+            }));
+        }
+    }
+    spawnFood() {
+        this.setState((prevState) => {
+            // Limit the number of food items on screen
+            if (prevState.foodItems.length >= 5) {
+                return prevState;
+            }
+
+            // Generate random position within the stage bounds
+            const stageWidth = this.rect ? this.rect.width : 480;
+            const stageHeight = this.rect ? this.rect.height : 360;
+
+            const newFood = {
+                id: Date.now() + Math.random(),
+                x: Math.random() * (stageWidth - 40) + 20, // Keep away from edges
+                y: Math.random() * (stageHeight - 40) + 20,
+                type: Math.floor(Math.random() * 3), // 0: apple, 1: bone, 2: fish
+                collected: false,
+            };
+
+            return {
+                foodItems: [...prevState.foodItems, newFood],
+            };
+        });
+    }
+    collectFood(foodId) {
+        this.setState((prevState) => {
+            const updatedFoodItems = prevState.foodItems.map((food) =>
+                food.id === foodId ? { ...food, collected: true } : food
+            );
+
+            // Remove collected food after a short delay
+            setTimeout(() => {
+                this.setState((prevState) => ({
+                    foodItems: prevState.foodItems.filter(
+                        (food) => food.id !== foodId
+                    ),
+                    collectedFood: prevState.collectedFood + 1,
+                }));
+            }, 300);
+
+            return {
+                foodItems: updatedFoodItems,
+            };
+        });
+    }
+    handleFoodClick(foodId) {
+        this.collectFood(foodId);
+        this.setState((prevState) => ({
+            collectedFood: prevState.collectedFood + 1,
+        }));
     }
     startColorPickingLoop() {
         this.intervalId = setInterval(() => {
@@ -543,12 +655,20 @@ class Stage extends React.Component {
 
     handleFeedPet() {
         this.setState((prevState) => {
+            if (prevState.collectedFood <= 0) {
+                return {
+                    petReactionMessage:
+                        "No food collected! Find food in the field first! 🍽️",
+                };
+            }
+
             const newHunger = Math.max(0, prevState.hunger - 20);
             const newCleanliness = Math.max(0, prevState.cleanliness - 5);
             setTimeout(this.clearPetReactionMessage, 1500);
             return {
                 hunger: newHunger,
                 cleanliness: newCleanliness,
+                collectedFood: prevState.collectedFood - 1,
                 petReactionMessage: "Yum! Thank you! 😋",
             };
         });
@@ -579,6 +699,19 @@ class Stage extends React.Component {
             };
         });
     }
+
+    handleSleepPet() {
+        this.setState((prevState) => {
+            const newEnergy = Math.min(100, prevState.energy + 30);
+            const newHunger = Math.max(0, prevState.hunger - 5);
+            setTimeout(this.clearPetReactionMessage, 1500);
+            return {
+                energy: newEnergy,
+                hunger: newHunger,
+                petReactionMessage: "Zzz... 💤",
+            };
+        });
+    }
     render() {
         const {
             vm, // eslint-disable-line no-unused-vars
@@ -596,6 +729,7 @@ class Stage extends React.Component {
                 onFeedPet={this.handleFeedPet}
                 onPlayWithPet={this.handlePlayWithPet}
                 onCleanPet={this.handleCleanPet}
+                onSleepPet={this.handleSleepPet}
                 hunger={this.state.hunger}
                 cleanliness={this.state.cleanliness}
                 happiness={this.state.happiness}
@@ -603,6 +737,11 @@ class Stage extends React.Component {
                 petReactionMessage={this.state.petReactionMessage}
                 petSpeechMessage={this.state.petSpeechMessage}
                 petSpeechVisible={this.state.petSpeechVisible}
+                petX={this.state.petX}
+                petY={this.state.petY}
+                foodItems={this.state.foodItems}
+                collectedFood={this.state.collectedFood}
+                onFoodClick={this.handleFoodClick}
                 {...props}
             />
         );
