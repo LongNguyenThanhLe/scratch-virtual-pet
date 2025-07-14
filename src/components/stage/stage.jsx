@@ -33,6 +33,11 @@ const StageComponent = (props) => {
         onDeactivateColorPicker,
         onDoubleClick,
         onQuestionAnswered,
+        hunger,
+        cleanliness,
+        petReactionMessage,
+        happiness,
+        energy,
         ...boxProps
     } = props;
 
@@ -63,6 +68,25 @@ const StageComponent = (props) => {
                         }}
                         {...boxProps}
                     />
+                    {/* Pet Status Display */}
+                    <div className={styles.petStatusRow}>
+                        <span>Hunger: {hunger}</span>
+                        <span>Cleanliness: {cleanliness}</span>
+                        <span>Happiness: {happiness}</span>
+                        <span className={styles.energyBarLabel}>Energy:</span>
+                        <div className={styles.energyBarWrapper}>
+                            <div
+                                className={styles.energyBar}
+                                style={{ width: `${energy}%` }}
+                            />
+                        </div>
+                    </div>
+                    {/* Pet Reaction Message */}
+                    {petReactionMessage && (
+                        <div className={styles.petReactionMessage}>
+                            {petReactionMessage}
+                        </div>
+                    )}
                     {/* Pet Interaction Buttons */}
                     <div className={styles.petButtonRow}>
                         <ButtonComponent
