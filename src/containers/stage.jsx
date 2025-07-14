@@ -47,6 +47,7 @@ class Stage extends React.Component {
             "clearPetReactionMessage",
             "checkPetNeeds",
             "clearPetSpeech",
+            "decayPetStats",
         ]);
         this.state = {
             mouseDownTimeoutId: null,
@@ -90,6 +91,8 @@ class Stage extends React.Component {
         this.props.vm.runtime.addListener("QUESTION", this.questionListener);
         // Start checking pet needs periodically
         this.petNeedsInterval = setInterval(this.checkPetNeeds, 5000);
+        // Start pet stat decay timer
+        this.petDecayInterval = setInterval(this.decayPetStats, 10000);
     }
     shouldComponentUpdate(nextProps, nextState) {
         return (
@@ -99,7 +102,15 @@ class Stage extends React.Component {
             this.props.isFullScreen !== nextProps.isFullScreen ||
             this.state.question !== nextState.question ||
             this.props.micIndicator !== nextProps.micIndicator ||
-            this.props.isStarted !== nextProps.isStarted
+            this.props.isStarted !== nextProps.isStarted ||
+            // Pet-related state changes
+            this.state.hunger !== nextState.hunger ||
+            this.state.cleanliness !== nextState.cleanliness ||
+            this.state.happiness !== nextState.happiness ||
+            this.state.energy !== nextState.energy ||
+            this.state.petReactionMessage !== nextState.petReactionMessage ||
+            this.state.petSpeechMessage !== nextState.petSpeechMessage ||
+            this.state.petSpeechVisible !== nextState.petSpeechVisible
         );
     }
     componentDidUpdate(prevProps) {
@@ -118,6 +129,9 @@ class Stage extends React.Component {
         this.props.vm.runtime.removeListener("QUESTION", this.questionListener);
         if (this.petNeedsInterval) {
             clearInterval(this.petNeedsInterval);
+        }
+        if (this.petDecayInterval) {
+            clearInterval(this.petDecayInterval);
         }
     }
     questionListener(question) {
@@ -503,6 +517,23 @@ class Stage extends React.Component {
         this.setState({
             petSpeechVisible: false,
             petSpeechMessage: "",
+        });
+    }
+
+    decayPetStats() {
+        this.setState((prevState) => {
+            // Gradual stat decreases - more realistic pet care simulation
+            const newHunger = Math.min(100, prevState.hunger + 3); // Gets hungrier
+            const newCleanliness = Math.max(0, prevState.cleanliness - 2); // Gets dirtier
+            const newHappiness = Math.max(0, prevState.happiness - 1); // Gets slightly sadder
+            const newEnergy = Math.max(0, prevState.energy - 1); // Gets slightly tired
+
+            return {
+                hunger: newHunger,
+                cleanliness: newCleanliness,
+                happiness: newHappiness,
+                energy: newEnergy,
+            };
         });
     }
 
