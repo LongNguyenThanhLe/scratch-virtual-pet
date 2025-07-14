@@ -38,6 +38,8 @@ const StageComponent = (props) => {
         petReactionMessage,
         happiness,
         energy,
+        petSpeechMessage,
+        petSpeechVisible,
         ...boxProps
     } = props;
 
@@ -143,6 +145,12 @@ const StageComponent = (props) => {
                             </div>
                         </div>
                     </div>
+                    {/* Pet Speech Bubble */}
+                    {petSpeechVisible && (
+                        <div className={styles.petSpeechBubble}>
+                            {petSpeechMessage}
+                        </div>
+                    )}
                     {/* Pet Reaction Message */}
                     {petReactionMessage && (
                         <div className={styles.petReactionMessage}>
