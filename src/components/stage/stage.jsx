@@ -33,11 +33,14 @@ const StageComponent = (props) => {
         onDeactivateColorPicker,
         onDoubleClick,
         onQuestionAnswered,
+        onFeedPet,
+        onPlayWithPet,
+        onCleanPet,
         hunger,
         cleanliness,
-        petReactionMessage,
         happiness,
         energy,
+        petReactionMessage,
         petSpeechMessage,
         petSpeechVisible,
         ...boxProps
@@ -159,21 +162,18 @@ const StageComponent = (props) => {
                     )}
                     {/* Pet Interaction Buttons */}
                     <div className={styles.petButtonRow}>
-                        <ButtonComponent
-                            iconSrc={feedIcon}
-                            onClick={props.onFeedPet}
-                        >
+                        <ButtonComponent iconSrc={feedIcon} onClick={onFeedPet}>
                             Feed
                         </ButtonComponent>
                         <ButtonComponent
                             iconSrc={playIcon}
-                            onClick={props.onPlayWithPet}
+                            onClick={onPlayWithPet}
                         >
                             Play
                         </ButtonComponent>
                         <ButtonComponent
                             iconSrc={cleanIcon}
-                            onClick={props.onCleanPet}
+                            onClick={onCleanPet}
                         >
                             Clean
                         </ButtonComponent>
