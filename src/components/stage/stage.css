@@ -533,3 +533,8 @@
         transform: scale(1);
     }
 }
+
+.foodFading {
+    opacity: 0;
+    transition: opacity 0.5s;
+}

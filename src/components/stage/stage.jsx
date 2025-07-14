@@ -88,7 +88,10 @@ const StageComponent = (props) => {
                     {foodItems.map((food) => (
                         <div
                             key={food.id}
-                            className={styles.foodItem}
+                            className={
+                                styles.foodItem +
+                                (food.fading ? " " + styles.foodFading : "")
+                            }
                             style={{
                                 position: "absolute",
                                 left: `${food.x}px`,
@@ -96,9 +99,6 @@ const StageComponent = (props) => {
                                 transform: "translate(-50%, -50%)",
                                 cursor: "pointer",
                                 zIndex: 100,
-                                animation: food.collected
-                                    ? styles.foodCollected
-                                    : styles.foodBounce,
                             }}
                             onClick={() => onFoodClick(food.id)}
                         >
@@ -182,17 +182,6 @@ const StageComponent = (props) => {
                                 />
                             </div>
                         </div>
-                    </div>
-
-                    {/* Collected Food Counter */}
-                    <div className={styles.foodCounter}>
-                        <span className={styles.foodCounterLabel}>
-                            Food Collected:
-                        </span>
-                        <span className={styles.foodCounterValue}>
-                            {collectedFood}
-                        </span>
-                        <span className={styles.foodCounterIcon}>🍽️</span>
                     </div>
 
                     {/* Pet Speech Bubble */}

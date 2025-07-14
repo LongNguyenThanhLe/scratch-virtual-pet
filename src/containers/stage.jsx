@@ -106,8 +106,8 @@ class Stage extends React.Component {
         this.petNeedsInterval = setInterval(this.checkPetNeeds, 5000);
         // Start pet stat decay timer
         this.petDecayInterval = setInterval(this.decayPetStats, 10000);
-        // Start food spawning timer
-        this.foodSpawnInterval = setInterval(this.spawnFood, 8000);
+        // Start food spawning timer (now every 30 seconds)
+        this.foodSpawnInterval = setInterval(this.spawnFood, 30000);
     }
     shouldComponentUpdate(nextProps, nextState) {
         return (
@@ -209,19 +209,41 @@ class Stage extends React.Component {
             if (prevState.foodItems.length >= 5) {
                 return prevState;
             }
-
             // Generate random position within the stage bounds
             const stageWidth = this.rect ? this.rect.width : 480;
             const stageHeight = this.rect ? this.rect.height : 360;
-
             const newFood = {
                 id: Date.now() + Math.random(),
                 x: Math.random() * (stageWidth - 40) + 20, // Keep away from edges
                 y: Math.random() * (stageHeight - 40) + 20,
                 type: Math.floor(Math.random() * 3), // 0: apple, 1: bone, 2: fish
                 collected: false,
+                fading: false,
             };
-
+            // Set a timeout to fade out and remove the food after 3 seconds if not collected
+            setTimeout(() => {
+                this.setState((prevState2) => {
+                    const food = prevState2.foodItems.find(
+                        (f) => f.id === newFood.id
+                    );
+                    if (food && !food.collected) {
+                        // Mark as fading
+                        const updatedFoodItems = prevState2.foodItems.map((f) =>
+                            f.id === newFood.id ? { ...f, fading: true } : f
+                        );
+                        // Remove after fade animation (0.5s)
+                        setTimeout(() => {
+                            this.setState((prevState3) => ({
+                                foodItems: prevState3.foodItems.filter(
+                                    (f) => f.id !== newFood.id
+                                ),
+                            }));
+                        }, 500);
+                        return { foodItems: updatedFoodItems };
+                    }
+                    return null;
+                });
+            }, 3000);
             return {
                 foodItems: [...prevState.foodItems, newFood],
             };
