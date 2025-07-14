@@ -153,8 +153,54 @@
     justify-content: center;
 }
 
+.petStatusRow {
+    position: absolute;
+    top: 1.2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 2rem;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 1.5rem;
+    padding: 0.4rem 1.2rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    z-index: 12;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    align-items: center;
+}
+
+.petReactionMessage {
+    position: absolute;
+    top: 4.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 200, 0.95);
+    border-radius: 1.2rem;
+    padding: 0.7rem 2rem;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #b8860b;
+    z-index: 15;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    opacity: 1;
+    animation: petReactionFade 1.5s linear forwards;
+}
+
 @keyframes flash {
     0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes petReactionFade {
+    0% {
+        opacity: 1;
+    }
+    80% {
         opacity: 1;
     }
     100% {

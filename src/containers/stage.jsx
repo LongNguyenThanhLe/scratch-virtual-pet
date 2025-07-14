@@ -44,6 +44,7 @@ class Stage extends React.Component {
             "handleFeedPet",
             "handlePlayWithPet",
             "handleCleanPet",
+            "clearPetReactionMessage",
         ]);
         this.state = {
             mouseDownTimeoutId: null,
@@ -55,6 +56,7 @@ class Stage extends React.Component {
             question: null,
             hunger: 50, // 0 = not hungry, 100 = starving
             cleanliness: 100, // 0 = dirty, 100 = clean
+            petReactionMessage: "",
         };
         if (this.props.vm.renderer) {
             this.renderer = this.props.vm.renderer;
@@ -445,20 +447,20 @@ class Stage extends React.Component {
     setDragCanvas(canvas) {
         this.dragCanvas = canvas;
     }
+    clearPetReactionMessage() {
+        this.setState({ petReactionMessage: "" });
+    }
+
     handleFeedPet() {
         this.setState((prevState) => {
             const newHunger = Math.max(0, prevState.hunger - 20);
             const newCleanliness = Math.max(0, prevState.cleanliness - 5);
-            // Pet reaction placeholder
-            console.log(
-                "Pet was fed! Hunger:",
-                newHunger,
-                "Cleanliness:",
-                newCleanliness
-            );
+            // Show pet reaction message
+            setTimeout(this.clearPetReactionMessage, 1500);
             return {
                 hunger: newHunger,
                 cleanliness: newCleanliness,
+                petReactionMessage: "Yum! Thank you!",
             };
         });
     }
@@ -487,6 +489,9 @@ class Stage extends React.Component {
                 onFeedPet={this.handleFeedPet}
                 onPlayWithPet={this.handlePlayWithPet}
                 onCleanPet={this.handleCleanPet}
+                hunger={this.state.hunger}
+                cleanliness={this.state.cleanliness}
+                petReactionMessage={this.state.petReactionMessage}
                 {...props}
             />
         );
