@@ -757,11 +757,13 @@ class Stage extends React.Component {
             const newHappiness = Math.min(100, prevState.happiness + 20);
             const newHunger = Math.max(0, prevState.hunger - 5);
             const newEnergy = Math.max(0, prevState.energy - 10);
+            const newCleanliness = Math.max(0, prevState.cleanliness - 10);
             setTimeout(this.clearPetReactionMessage, 1500);
             return {
                 happiness: newHappiness,
                 hunger: newHunger,
                 energy: newEnergy,
+                cleanliness: newCleanliness,
                 petReactionMessage: "Yay! That was fun! 😺🎉",
             };
         });
