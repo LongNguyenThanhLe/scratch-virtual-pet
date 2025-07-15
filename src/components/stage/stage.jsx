@@ -54,6 +54,12 @@ const StageComponent = (props) => {
         onWasteClick,
         isSleeping,
         sleepCountdown,
+        disableFeed,
+        disablePlay,
+        disableClean,
+        disableFood,
+        disableWaste,
+        disableSleep,
         ...boxProps
     } = props;
 
@@ -101,12 +107,16 @@ const StageComponent = (props) => {
                                 left: `${food.x}px`,
                                 top: `${food.y}px`,
                                 transform: "translate(-50%, -50%)",
-                                cursor: isSleeping ? "not-allowed" : "pointer",
+                                cursor:
+                                    isSleeping || disableFood
+                                        ? "not-allowed"
+                                        : "pointer",
                                 zIndex: 100,
-                                pointerEvents: isSleeping ? "none" : "auto",
+                                pointerEvents:
+                                    isSleeping || disableFood ? "none" : "auto",
                             }}
                             onClick={
-                                isSleeping
+                                isSleeping || disableFood
                                     ? undefined
                                     : () => onFoodClick(food.id)
                             }
@@ -133,15 +143,19 @@ const StageComponent = (props) => {
                                     left: `${waste.x}px`,
                                     top: `${waste.y}px`,
                                     transform: "translate(-50%, -50%)",
-                                    cursor: isSleeping
-                                        ? "not-allowed"
-                                        : "pointer",
+                                    cursor:
+                                        isSleeping || disableWaste
+                                            ? "not-allowed"
+                                            : "pointer",
                                     zIndex: 101,
                                     fontSize: "2.2rem",
-                                    pointerEvents: isSleeping ? "none" : "auto",
+                                    pointerEvents:
+                                        isSleeping || disableWaste
+                                            ? "none"
+                                            : "auto",
                                 }}
                                 onClick={
-                                    isSleeping
+                                    isSleeping || disableWaste
                                         ? undefined
                                         : () => onWasteClick(waste.id)
                                 }
@@ -255,28 +269,30 @@ const StageComponent = (props) => {
                         <ButtonComponent
                             iconSrc={feedIcon}
                             onClick={onFeedPet}
-                            disabled={collectedFood <= 0 || isSleeping}
+                            disabled={
+                                collectedFood <= 0 || isSleeping || disableFeed
+                            }
                         >
                             Feed ({collectedFood})
                         </ButtonComponent>
                         <ButtonComponent
                             iconSrc={playIcon}
                             onClick={onPlayWithPet}
-                            disabled={isSleeping}
+                            disabled={isSleeping || disablePlay}
                         >
                             Play
                         </ButtonComponent>
                         <ButtonComponent
                             iconSrc={cleanIcon}
                             onClick={onCleanPet}
-                            disabled={isSleeping}
+                            disabled={isSleeping || disableClean}
                         >
                             Clean
                         </ButtonComponent>
                         <ButtonComponent
                             iconSrc={sleepIcon}
                             onClick={onSleepPet}
-                            disabled={isSleeping}
+                            disabled={isSleeping || disableSleep}
                         >
                             Sleep
                         </ButtonComponent>
@@ -398,6 +414,12 @@ StageComponent.propTypes = {
     onWasteClick: PropTypes.func,
     isSleeping: PropTypes.bool,
     sleepCountdown: PropTypes.number,
+    disableFeed: PropTypes.bool,
+    disablePlay: PropTypes.bool,
+    disableClean: PropTypes.bool,
+    disableFood: PropTypes.bool,
+    disableWaste: PropTypes.bool,
+    disableSleep: PropTypes.bool,
 };
 StageComponent.defaultProps = {
     dragRef: () => {},
