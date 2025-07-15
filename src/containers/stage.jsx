@@ -289,6 +289,15 @@ class Stage extends React.Component {
     }
     handleFoodClick(foodId) {
         if (this.state.isSleeping) return;
+        if (this.state.energy < 2) {
+            this.setState({
+                petSpeechMessage:
+                    "I’m too tired! Let me sleep to get my energy back! 😴",
+                petSpeechVisible: true,
+            });
+            setTimeout(this.clearPetSpeech, 2000);
+            return;
+        }
         this.collectFood(foodId);
     }
     spawnWaste = () => {
@@ -309,6 +318,15 @@ class Stage extends React.Component {
 
     handleWasteClick = (wasteId) => {
         if (this.state.isSleeping) return;
+        if (this.state.energy < 8) {
+            this.setState({
+                petSpeechMessage:
+                    "I’m too tired! Let me sleep to get my energy back! 😴",
+                petSpeechVisible: true,
+            });
+            setTimeout(this.clearPetSpeech, 2000);
+            return;
+        }
         // Animate fade out, then remove
         this.setState((prevState) => ({
             wasteItems: prevState.wasteItems.map((w) =>
@@ -740,6 +758,15 @@ class Stage extends React.Component {
 
     handleFeedPet() {
         if (this.state.isSleeping) return;
+        if (this.state.energy < 2) {
+            this.setState({
+                petSpeechMessage:
+                    "I’m too tired! Let me sleep to get my energy back! 😴",
+                petSpeechVisible: true,
+            });
+            setTimeout(this.clearPetSpeech, 2000);
+            return;
+        }
         this.setState((prevState) => {
             if (prevState.collectedFood <= 0) {
                 return {
@@ -763,6 +790,15 @@ class Stage extends React.Component {
 
     handlePlayWithPet() {
         if (this.state.isSleeping) return;
+        if (this.state.energy < 10) {
+            this.setState({
+                petSpeechMessage:
+                    "I’m too tired! Let me sleep to get my energy back! 😴",
+                petSpeechVisible: true,
+            });
+            setTimeout(this.clearPetSpeech, 2000);
+            return;
+        }
         this.setState((prevState) => {
             const newHappiness = Math.min(100, prevState.happiness + 20);
             const newHunger = Math.min(100, prevState.hunger + 5);
@@ -781,6 +817,15 @@ class Stage extends React.Component {
 
     handleCleanPet() {
         if (this.state.isSleeping) return;
+        if (this.state.energy < 10) {
+            this.setState({
+                petSpeechMessage:
+                    "I’m too tired! Let me sleep to get my energy back! 😴",
+                petSpeechVisible: true,
+            });
+            setTimeout(this.clearPetSpeech, 2000);
+            return;
+        }
         this.setState((prevState) => {
             const newCleanliness = Math.min(100, prevState.cleanliness + 10);
             const newEnergy = Math.max(0, prevState.energy - 10);
@@ -862,6 +907,11 @@ class Stage extends React.Component {
                 onWasteClick={this.handleWasteClick}
                 isSleeping={this.state.isSleeping}
                 sleepCountdown={this.state.sleepCountdown}
+                disableFeed={this.state.energy < 2}
+                disablePlay={this.state.energy < 10}
+                disableClean={this.state.energy < 10}
+                disableFood={this.state.energy < 2}
+                disableWaste={this.state.energy < 8}
                 {...props}
             />
         );
