@@ -797,11 +797,9 @@ class Stage extends React.Component {
         if (this.state.isSleeping) return;
         this.setState({ isSleeping: true, sleepCountdown: 30 });
         this.setState((prevState) => {
-            const newEnergy = Math.min(100, prevState.energy + 30);
             const newHunger = Math.max(0, prevState.hunger - 5);
             setTimeout(this.clearPetReactionMessage, 1500);
             return {
-                energy: newEnergy,
                 hunger: newHunger,
                 petReactionMessage: "Zzz... 💤",
             };
@@ -811,9 +809,22 @@ class Stage extends React.Component {
             this.setState((prevState) => {
                 if (prevState.sleepCountdown <= 1) {
                     clearInterval(this.sleepInterval);
-                    return { isSleeping: false, sleepCountdown: 0 };
+                    return {
+                        isSleeping: false,
+                        sleepCountdown: 0,
+                        energy: 100,
+                    };
                 }
-                return { sleepCountdown: prevState.sleepCountdown - 1 };
+                // Gradually increase energy
+                const energyIncrement = 4; // 4 * 30 = 120, but capped at 100
+                const newEnergy = Math.min(
+                    100,
+                    prevState.energy + energyIncrement
+                );
+                return {
+                    sleepCountdown: prevState.sleepCountdown - 1,
+                    energy: newEnergy,
+                };
             });
         }, 1000);
     }
