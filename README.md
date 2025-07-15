@@ -1,4 +1,153 @@
 # scratch-gui
+Here’s your polished `README.md` version of the **Virtual Pet Game Rules & Mechanics**, optimized for GitHub with proper markdown formatting, emoji usage, and clear headings:
+
+```markdown
+# 🐾 Virtual Pet Game — Rules & Mechanics
+
+Welcome to the virtual pet simulator! Below are the gameplay mechanics, rules, and strategy guide for keeping your digital companion happy and healthy.
+
+---
+
+## 🎯 Pet Stats
+
+| Stat         | Range  | Description                  |
+|--------------|--------|------------------------------|
+| **Hunger**   | 0–100  | 0 = Full, 100 = Starving     |
+| **Cleanliness** | 0–100 | 0 = Dirty, 100 = Clean     |
+| **Happiness**| 0–100  | 0 = Sad, 100 = Very Happy    |
+| **Energy**   | 0–100  | 0 = Tired, 100 = Fully Rested|
+
+---
+
+## ⏳ Stat Decay (Every 20 Seconds)
+
+| Stat           | Change     | Details                               |
+|----------------|------------|----------------------------------------|
+| **Hunger**     | +3         | Pet gets hungrier                     |
+| **Cleanliness**| -2 / -10   | -10 if waste is present               |
+| **Happiness**  | -1         | Pet gets slightly sadder              |
+| **Energy**     | -1         | Pet gets slightly tired               |
+
+---
+
+## 🛠️ Actions & Effects
+
+### 🍽️ Feed Pet  
+- **Requires**: Energy ≥ 2 and 1 food item  
+- **Effects**:
+  - Hunger: -20  
+  - Cleanliness: -5  
+  - Energy: +5  
+- **Reaction**: _"Yum! Thank you! 😋"_
+
+---
+
+### 🧸 Play with Pet  
+- **Requires**: Energy ≥ 10 and Hunger ≤ 80  
+- **Effects**:
+  - Happiness: +20  
+  - Hunger: +5  
+  - Energy: -10  
+  - Cleanliness: -10  
+- **Reaction**: _"Yay! That was fun! 😺🎉"_
+
+---
+
+### 🛁 Clean Pet  
+- **Requires**: Energy ≥ 10  
+- **Effects**:
+  - Cleanliness: +10  
+  - Energy: -10  
+- **Reaction**: _"So fresh! 🛁✨"_
+
+---
+
+### 💤 Sleep  
+- **Always Available**  
+- **Duration**: 30 seconds  
+- **Effects**:
+  - Hunger: -5  
+  - Energy: +4 per second (up to 100)  
+- **Reaction**: _"Zzz... 😴"_
+
+---
+
+## 🍎 Food System
+
+| Attribute     | Details                             |
+|---------------|--------------------------------------|
+| **Spawn Rate**| Every 20 seconds                    |
+| **Types**     | 🍎 Apple, 🦴 Bone, 🐟 Fish           |
+| **Lifespan**  | 5 seconds before disappearing        |
+| **Collection**| Always available (no energy needed)  |
+| **Storage**   | Unlimited                            |
+
+---
+
+## 💩 Waste System
+
+| Attribute     | Details                                   |
+|---------------|--------------------------------------------|
+| **Spawn Rate**| Every 3 minutes (180 seconds)             |
+| **Lifespan**  | Permanent until cleaned                   |
+| **Requires**  | Energy ≥ 8                                |
+| **Effect**    | Accelerates cleanliness decay when present|
+
+---
+
+## 💬 Speech Bubble Triggers
+
+| Condition             | Message                     |
+|-----------------------|-----------------------------|
+| Hunger > 70           | _"I'm starving! 🍽️"_         |
+| Cleanliness < 30      | _"I feel so dirty! 🛁"_       |
+| Happiness < 40        | _"I'm so sad... 😢"_         |
+| Energy < 20           | _"I'm so tired... 😴"_       |
+
+---
+
+## ⛔ Button Disable Rules
+
+| Button        | Disabled If                            |
+|---------------|-----------------------------------------|
+| **Feed**      | Energy < 2                              |
+| **Play**      | Energy < 10 or Hunger > 80              |
+| **Clean**     | Energy < 10                             |
+| **Sleep**     | ✅ Always enabled                        |
+| **Collect Food**| ✅ Always enabled                     |
+| **Clean Waste**| Energy < 8                             |
+
+---
+
+## 🔁 Game Flow Strategy
+
+1. **Collect food** regularly — no energy required.
+2. **Sleep** when energy is low.
+3. **Feed** the pet when you have food and energy ≥ 2.
+4. **Play** when hunger ≤ 80 and energy ≥ 10.
+5. **Clean** the pet when energy ≥ 10.
+6. **Remove waste** as soon as possible to avoid fast dirtiness.
+
+---
+
+## 🚨 Critical Situations
+
+| Situation                   | Suggested Action                          |
+|----------------------------|--------------------------------------------|
+| Low Energy + High Hunger   | Sleep first → then feed                   |
+| Waste Present              | Clean waste ASAP                          |
+| Multiple Stats Are Low     | Prioritize energy recovery via sleep      |
+
+---
+
+> 💡 Tip: Keeping your pet balanced across all stats is the key to long-term happiness!
+
+---
+
+```
+
+Let me know if you'd like it auto-deployed into a project or need a `README.md` file generated for download.
+
 
 ## **⚠️ NOTICE: Repository Migration to Mono-Repo ⚠️**
 
