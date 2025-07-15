@@ -737,13 +737,14 @@ class Stage extends React.Component {
                         "No food collected! Find food in the field first! 🍽️",
                 };
             }
-
             const newHunger = Math.max(0, prevState.hunger - 20);
             const newCleanliness = Math.max(0, prevState.cleanliness - 5);
+            const newEnergy = Math.min(100, prevState.energy + 5);
             setTimeout(this.clearPetReactionMessage, 1500);
             return {
                 hunger: newHunger,
                 cleanliness: newCleanliness,
+                energy: newEnergy,
                 collectedFood: prevState.collectedFood - 1,
                 petReactionMessage: "Yum! Thank you! 😋",
             };
@@ -769,10 +770,12 @@ class Stage extends React.Component {
     handleCleanPet() {
         if (this.state.isSleeping) return;
         this.setState((prevState) => {
-            const newCleanliness = Math.min(100, prevState.cleanliness + 30);
+            const newCleanliness = Math.min(100, prevState.cleanliness + 10);
+            const newEnergy = Math.max(0, prevState.energy - 10);
             setTimeout(this.clearPetReactionMessage, 1500);
             return {
                 cleanliness: newCleanliness,
+                energy: newEnergy,
                 petReactionMessage: "So fresh! 🛁✨",
             };
         });
