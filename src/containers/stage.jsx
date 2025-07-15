@@ -71,8 +71,8 @@ class Stage extends React.Component {
             petReactionMessage: "",
             petSpeechMessage: "",
             petSpeechVisible: false,
-            petX: 0, // Pet's x coordinate
-            petY: 0, // Pet's y coordinate
+            petX: 240, // Default to center of stage
+            petY: 180, // Default to center of stage
             foodItems: [], // Array of food items in the field
             collectedFood: 0, // Number of food items collected
             wasteItems: [], // Array of waste items (animal waste)
@@ -662,33 +662,40 @@ class Stage extends React.Component {
         let message = "";
         let shouldShow = false;
 
-        if (hunger > 80) {
+        console.log("Checking pet needs:", {
+            hunger,
+            cleanliness,
+            happiness,
+            energy,
+        });
+
+        if (hunger > 70) {
             message = "I'm starving! 😫";
             shouldShow = true;
-        } else if (hunger > 60) {
-            message = "I'm getting hungry... 🍽️";
-            shouldShow = true;
+            console.log("Hunger trigger:", hunger);
         } else if (cleanliness < 30) {
             message = "I feel so dirty! 🛁";
             shouldShow = true;
-        } else if (cleanliness < 50) {
-            message = "I could use a bath... 🧼";
-            shouldShow = true;
-        } else if (happiness < 30) {
+            console.log("Cleanliness trigger:", cleanliness);
+        } else if (happiness < 40) {
             message = "I'm so sad... 😢";
             shouldShow = true;
-        } else if (happiness < 50) {
-            message = "I'm feeling down... 😔";
-            shouldShow = true;
-        } else if (energy < 30) {
+            console.log("Happiness trigger:", happiness);
+        } else if (energy < 20) {
             message = "I'm so tired... 😴";
             shouldShow = true;
-        } else if (energy < 50) {
-            message = "I need some rest... 💤";
-            shouldShow = true;
+            console.log("Energy trigger:", energy);
         }
 
+        console.log(
+            "Should show speech:",
+            shouldShow,
+            "Current visible:",
+            this.state.petSpeechVisible
+        );
+
         if (shouldShow && !this.state.petSpeechVisible) {
+            console.log("Setting speech bubble:", message);
             this.setState({
                 petSpeechMessage: message,
                 petSpeechVisible: true,
@@ -758,7 +765,7 @@ class Stage extends React.Component {
         if (this.state.isSleeping) return;
         this.setState((prevState) => {
             const newHappiness = Math.min(100, prevState.happiness + 20);
-            const newHunger = Math.max(0, prevState.hunger - 5);
+            const newHunger = Math.min(100, prevState.hunger + 5);
             const newEnergy = Math.max(0, prevState.energy - 10);
             const newCleanliness = Math.max(0, prevState.cleanliness - 10);
             setTimeout(this.clearPetReactionMessage, 1500);
