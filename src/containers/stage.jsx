@@ -790,6 +790,15 @@ class Stage extends React.Component {
 
     handlePlayWithPet() {
         if (this.state.isSleeping) return;
+        if (this.state.hunger > 80) {
+            this.setState({
+                petSpeechMessage:
+                    "I'm too hungry to play! Please feed me first! 😫",
+                petSpeechVisible: true,
+            });
+            setTimeout(this.clearPetSpeech, 2000);
+            return;
+        }
         if (this.state.energy < 10) {
             this.setState({
                 petSpeechMessage:
@@ -840,6 +849,15 @@ class Stage extends React.Component {
 
     handleSleepPet() {
         if (this.state.isSleeping) return;
+        if (this.state.hunger > 80) {
+            this.setState({
+                petSpeechMessage:
+                    "I'm too hungry to sleep! Please feed me first! 😫",
+                petSpeechVisible: true,
+            });
+            setTimeout(this.clearPetSpeech, 2000);
+            return;
+        }
         this.setState({ isSleeping: true, sleepCountdown: 30 });
         this.setState((prevState) => {
             const newHunger = Math.max(0, prevState.hunger - 5);
@@ -908,10 +926,11 @@ class Stage extends React.Component {
                 isSleeping={this.state.isSleeping}
                 sleepCountdown={this.state.sleepCountdown}
                 disableFeed={this.state.energy < 2}
-                disablePlay={this.state.energy < 10}
+                disablePlay={this.state.energy < 10 || this.state.hunger > 80}
                 disableClean={this.state.energy < 10}
                 disableFood={this.state.energy < 2}
                 disableWaste={this.state.energy < 8}
+                disableSleep={this.state.hunger > 80}
                 {...props}
             />
         );

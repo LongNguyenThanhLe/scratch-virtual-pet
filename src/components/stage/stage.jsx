@@ -59,6 +59,7 @@ const StageComponent = (props) => {
         disableClean,
         disableFood,
         disableWaste,
+        disableSleep,
         ...boxProps
     } = props;
 
@@ -291,7 +292,7 @@ const StageComponent = (props) => {
                         <ButtonComponent
                             iconSrc={sleepIcon}
                             onClick={onSleepPet}
-                            disabled={isSleeping}
+                            disabled={isSleeping || disableSleep}
                         >
                             Sleep
                         </ButtonComponent>
@@ -418,6 +419,7 @@ StageComponent.propTypes = {
     disableClean: PropTypes.bool,
     disableFood: PropTypes.bool,
     disableWaste: PropTypes.bool,
+    disableSleep: PropTypes.bool,
 };
 StageComponent.defaultProps = {
     dragRef: () => {},
