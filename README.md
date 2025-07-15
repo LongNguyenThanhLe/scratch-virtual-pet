@@ -1,5 +1,4 @@
 # scratch-gui
-Here’s your polished `README.md` version of the **Virtual Pet Game Rules & Mechanics**, optimized for GitHub with proper markdown formatting, emoji usage, and clear headings:
 
 ```markdown
 # 🐾 Virtual Pet Game — Rules & Mechanics
@@ -146,7 +145,6 @@ Welcome to the virtual pet simulator! Below are the gameplay mechanics, rules, a
 
 ```
 
-Let me know if you'd like it auto-deployed into a project or need a `README.md` file generated for download.
 
 
 ## **⚠️ NOTICE: Repository Migration to Mono-Repo ⚠️**
