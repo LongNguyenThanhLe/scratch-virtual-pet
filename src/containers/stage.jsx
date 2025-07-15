@@ -928,7 +928,7 @@ class Stage extends React.Component {
                 disableFeed={this.state.energy < 2}
                 disablePlay={this.state.energy < 10 || this.state.hunger > 80}
                 disableClean={this.state.energy < 10}
-                disableFood={this.state.energy < 2}
+                disableFood={false}
                 disableWaste={this.state.energy < 8}
                 disableSleep={this.state.hunger > 80}
                 {...props}
