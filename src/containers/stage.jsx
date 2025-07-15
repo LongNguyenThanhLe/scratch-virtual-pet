@@ -139,7 +139,10 @@ class Stage extends React.Component {
             this.state.foodItems !== nextState.foodItems ||
             this.state.collectedFood !== nextState.collectedFood ||
             // Waste-related state changes
-            this.state.wasteItems !== nextState.wasteItems
+            this.state.wasteItems !== nextState.wasteItems ||
+            // Sleep-related state changes
+            this.state.isSleeping !== nextState.isSleeping ||
+            this.state.sleepCountdown !== nextState.sleepCountdown
         );
     }
     componentDidUpdate(prevProps) {
