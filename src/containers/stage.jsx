@@ -76,6 +76,8 @@ class Stage extends React.Component {
             foodItems: [], // Array of food items in the field
             collectedFood: 0, // Number of food items collected
             wasteItems: [], // Array of waste items (animal waste)
+            isSleeping: false,
+            sleepCountdown: 0,
         };
         if (this.props.vm.renderer) {
             this.renderer = this.props.vm.renderer;
@@ -109,8 +111,8 @@ class Stage extends React.Component {
         this.petNeedsInterval = setInterval(this.checkPetNeeds, 5000);
         // Start pet stat decay timer
         this.petDecayInterval = setInterval(this.decayPetStats, 10000);
-        // Start food spawning timer (now every 30 seconds)
-        this.foodSpawnInterval = setInterval(this.spawnFood, 30000);
+        // Start food spawning timer (now every 20 seconds)
+        this.foodSpawnInterval = setInterval(this.spawnFood, 20000);
         // Start waste spawning timer (every 3 minutes)
         this.wasteSpawnInterval = setInterval(this.spawnWaste, 180000);
     }
@@ -169,6 +171,9 @@ class Stage extends React.Component {
         }
         if (this.wasteSpawnInterval) {
             clearInterval(this.wasteSpawnInterval);
+        }
+        if (this.sleepInterval) {
+            clearInterval(this.sleepInterval);
         }
     }
     questionListener(question) {
@@ -230,7 +235,7 @@ class Stage extends React.Component {
                 collected: false,
                 fading: false,
             };
-            // Set a timeout to fade out and remove the food after 3 seconds if not collected
+            // Set a timeout to fade out and remove the food after 5 seconds if not collected
             setTimeout(() => {
                 this.setState((prevState2) => {
                     const food = prevState2.foodItems.find(
@@ -253,7 +258,7 @@ class Stage extends React.Component {
                     }
                     return null;
                 });
-            }, 3000);
+            }, 5000);
             return {
                 foodItems: [...prevState.foodItems, newFood],
             };
@@ -264,7 +269,6 @@ class Stage extends React.Component {
             const updatedFoodItems = prevState.foodItems.map((food) =>
                 food.id === foodId ? { ...food, collected: true } : food
             );
-
             // Remove collected food after a short delay
             setTimeout(() => {
                 this.setState((prevState) => ({
@@ -272,19 +276,17 @@ class Stage extends React.Component {
                         (food) => food.id !== foodId
                     ),
                     collectedFood: prevState.collectedFood + 1,
+                    energy: Math.max(0, prevState.energy - 2),
                 }));
             }, 300);
-
             return {
                 foodItems: updatedFoodItems,
             };
         });
     }
     handleFoodClick(foodId) {
+        if (this.state.isSleeping) return;
         this.collectFood(foodId);
-        this.setState((prevState) => ({
-            collectedFood: prevState.collectedFood + 1,
-        }));
     }
     spawnWaste = () => {
         // Only one waste at a time for simplicity
@@ -303,6 +305,7 @@ class Stage extends React.Component {
     };
 
     handleWasteClick = (wasteId) => {
+        if (this.state.isSleeping) return;
         // Animate fade out, then remove
         this.setState((prevState) => ({
             wasteItems: prevState.wasteItems.map((w) =>
@@ -314,6 +317,7 @@ class Stage extends React.Component {
                 wasteItems: prevState.wasteItems.filter(
                     (w) => w.id !== wasteId
                 ),
+                energy: Math.max(0, prevState.energy - 8),
             }));
         }, 500);
         // Optionally show a cleaning message
@@ -725,6 +729,7 @@ class Stage extends React.Component {
     }
 
     handleFeedPet() {
+        if (this.state.isSleeping) return;
         this.setState((prevState) => {
             if (prevState.collectedFood <= 0) {
                 return {
@@ -732,13 +737,14 @@ class Stage extends React.Component {
                         "No food collected! Find food in the field first! 🍽️",
                 };
             }
-
             const newHunger = Math.max(0, prevState.hunger - 20);
             const newCleanliness = Math.max(0, prevState.cleanliness - 5);
+            const newEnergy = Math.min(100, prevState.energy + 5);
             setTimeout(this.clearPetReactionMessage, 1500);
             return {
                 hunger: newHunger,
                 cleanliness: newCleanliness,
+                energy: newEnergy,
                 collectedFood: prevState.collectedFood - 1,
                 petReactionMessage: "Yum! Thank you! 😋",
             };
@@ -746,32 +752,40 @@ class Stage extends React.Component {
     }
 
     handlePlayWithPet() {
+        if (this.state.isSleeping) return;
         this.setState((prevState) => {
             const newHappiness = Math.min(100, prevState.happiness + 20);
             const newHunger = Math.max(0, prevState.hunger - 5);
             const newEnergy = Math.max(0, prevState.energy - 10);
+            const newCleanliness = Math.max(0, prevState.cleanliness - 10);
             setTimeout(this.clearPetReactionMessage, 1500);
             return {
                 happiness: newHappiness,
                 hunger: newHunger,
                 energy: newEnergy,
+                cleanliness: newCleanliness,
                 petReactionMessage: "Yay! That was fun! 😺🎉",
             };
         });
     }
 
     handleCleanPet() {
+        if (this.state.isSleeping) return;
         this.setState((prevState) => {
-            const newCleanliness = Math.min(100, prevState.cleanliness + 30);
+            const newCleanliness = Math.min(100, prevState.cleanliness + 10);
+            const newEnergy = Math.max(0, prevState.energy - 10);
             setTimeout(this.clearPetReactionMessage, 1500);
             return {
                 cleanliness: newCleanliness,
+                energy: newEnergy,
                 petReactionMessage: "So fresh! 🛁✨",
             };
         });
     }
 
     handleSleepPet() {
+        if (this.state.isSleeping) return;
+        this.setState({ isSleeping: true, sleepCountdown: 30 });
         this.setState((prevState) => {
             const newEnergy = Math.min(100, prevState.energy + 30);
             const newHunger = Math.max(0, prevState.hunger - 5);
@@ -782,6 +796,16 @@ class Stage extends React.Component {
                 petReactionMessage: "Zzz... 💤",
             };
         });
+        // Start countdown interval
+        this.sleepInterval = setInterval(() => {
+            this.setState((prevState) => {
+                if (prevState.sleepCountdown <= 1) {
+                    clearInterval(this.sleepInterval);
+                    return { isSleeping: false, sleepCountdown: 0 };
+                }
+                return { sleepCountdown: prevState.sleepCountdown - 1 };
+            });
+        }, 1000);
     }
     render() {
         const {
@@ -815,6 +839,8 @@ class Stage extends React.Component {
                 onFoodClick={this.handleFoodClick}
                 wasteItems={this.state.wasteItems}
                 onWasteClick={this.handleWasteClick}
+                isSleeping={this.state.isSleeping}
+                sleepCountdown={this.state.sleepCountdown}
                 {...props}
             />
         );
