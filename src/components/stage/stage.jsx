@@ -233,22 +233,24 @@ const StageComponent = (props) => {
                                         />
                                     </div>
                                 </div>
-                                <span className={styles.metricLabel}>
-                                    Happiness:
-                                </span>
-                                <div className={styles.metricBarWrapper}>
-                                    <div
-                                        className={styles.metricBar}
-                                        style={{
-                                            width: `${happiness}%`,
-                                            backgroundColor:
-                                                happiness > 70
-                                                    ? "#4caf50"
-                                                    : happiness > 40
-                                                    ? "#ffa726"
-                                                    : "#ff6b6b",
-                                        }}
-                                    />
+                                <div className={styles.petMetric}>
+                                    <span className={styles.metricLabel}>
+                                        Happiness:
+                                    </span>
+                                    <div className={styles.metricBarWrapper}>
+                                        <div
+                                            className={styles.metricBar}
+                                            style={{
+                                                width: `${happiness}%`,
+                                                backgroundColor:
+                                                    happiness > 70
+                                                        ? "#4caf50"
+                                                        : happiness > 40
+                                                        ? "#ffa726"
+                                                        : "#ff6b6b",
+                                            }}
+                                        />
+                                    </div>
                                 </div>
                                 <div className={styles.petMetric}>
                                     <span className={styles.metricLabel}>
