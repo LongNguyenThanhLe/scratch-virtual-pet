@@ -11,6 +11,7 @@ import VideoProvider from "../lib/video/video-provider";
 import { BitmapAdapter as V2BitmapAdapter } from "scratch-svg-renderer";
 
 import StageComponent from "../components/stage/stage.jsx";
+import Switch from "../components/button/switch.jsx";
 
 import {
     activateColorPicker,
@@ -55,6 +56,7 @@ class Stage extends React.Component {
             "handleFoodClick",
             "spawnWaste",
             "handleWasteClick",
+            "handleTogglePet",
         ]);
         this.state = {
             mouseDownTimeoutId: null,
@@ -78,6 +80,7 @@ class Stage extends React.Component {
             wasteItems: [], // Array of waste items (animal waste)
             isSleeping: false,
             sleepCountdown: 0,
+            petEnabled: true,
         };
         if (this.props.vm.renderer) {
             this.renderer = this.props.vm.renderer;
@@ -97,6 +100,7 @@ class Stage extends React.Component {
             this.props.vm.renderer.draw();
         }
         this.props.vm.attachV2BitmapAdapter(new V2BitmapAdapter());
+        this.handleTogglePet = this.handleTogglePet.bind(this);
     }
     componentDidMount() {
         this.attachRectEvents();
@@ -107,14 +111,9 @@ class Stage extends React.Component {
             "targetsUpdate",
             this.handleTargetsUpdate
         );
-        // Start checking pet needs periodically
-        this.petNeedsInterval = setInterval(this.checkPetNeeds, 5000);
-        // Start pet stat decay timer
-        this.petDecayInterval = setInterval(this.decayPetStats, 10000);
-        // Start food spawning timer (now every 20 seconds)
-        this.foodSpawnInterval = setInterval(this.spawnFood, 20000);
-        // Start waste spawning timer (every 3 minutes)
-        this.wasteSpawnInterval = setInterval(this.spawnWaste, 180000);
+        if (this.state.petEnabled) {
+            this.startPetIntervals();
+        }
     }
     shouldComponentUpdate(nextProps, nextState) {
         return (
@@ -142,10 +141,18 @@ class Stage extends React.Component {
             this.state.wasteItems !== nextState.wasteItems ||
             // Sleep-related state changes
             this.state.isSleeping !== nextState.isSleeping ||
-            this.state.sleepCountdown !== nextState.sleepCountdown
+            this.state.sleepCountdown !== nextState.sleepCountdown ||
+            this.state.petEnabled !== nextState.petEnabled
         );
     }
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps, prevState) {
+        if (prevState.petEnabled !== this.state.petEnabled) {
+            if (this.state.petEnabled) {
+                this.startPetIntervals();
+            } else {
+                this.clearPetIntervals();
+            }
+        }
         if (this.props.isColorPicking && !prevProps.isColorPicking) {
             this.startColorPickingLoop();
         } else if (!this.props.isColorPicking && prevProps.isColorPicking) {
@@ -163,21 +170,7 @@ class Stage extends React.Component {
             "targetsUpdate",
             this.handleTargetsUpdate
         );
-        if (this.petNeedsInterval) {
-            clearInterval(this.petNeedsInterval);
-        }
-        if (this.petDecayInterval) {
-            clearInterval(this.petDecayInterval);
-        }
-        if (this.foodSpawnInterval) {
-            clearInterval(this.foodSpawnInterval);
-        }
-        if (this.wasteSpawnInterval) {
-            clearInterval(this.wasteSpawnInterval);
-        }
-        if (this.sleepInterval) {
-            clearInterval(this.sleepInterval);
-        }
+        this.clearPetIntervals();
     }
     questionListener(question) {
         this.setState({ question: question });
@@ -882,7 +875,46 @@ class Stage extends React.Component {
             });
         }, 1000);
     }
+
+    handleTogglePet(e) {
+        this.setState({ petEnabled: e.target.checked });
+    }
+
+    startPetIntervals() {
+        // Start all pet-related intervals (stat decay, food/waste spawn)
+        if (!this.statDecayInterval) {
+            this.statDecayInterval = setInterval(
+                () => this.decayPetStats(),
+                20000
+            );
+        }
+        if (!this.foodSpawnInterval) {
+            this.foodSpawnInterval = setInterval(() => this.spawnFood(), 20000);
+        }
+        if (!this.wasteSpawnInterval) {
+            this.wasteSpawnInterval = setInterval(
+                () => this.spawnWaste(),
+                180000
+            );
+        }
+    }
+
+    clearPetIntervals() {
+        if (this.statDecayInterval) {
+            clearInterval(this.statDecayInterval);
+            this.statDecayInterval = null;
+        }
+        if (this.foodSpawnInterval) {
+            clearInterval(this.foodSpawnInterval);
+            this.foodSpawnInterval = null;
+        }
+        if (this.wasteSpawnInterval) {
+            clearInterval(this.wasteSpawnInterval);
+            this.wasteSpawnInterval = null;
+        }
+    }
     render() {
+        const { petEnabled } = this.state;
         const {
             vm, // eslint-disable-line no-unused-vars
             onActivateColorPicker, // eslint-disable-line no-unused-vars
@@ -890,38 +922,45 @@ class Stage extends React.Component {
         } = this.props;
         return (
             <StageComponent
+                petEnabled={petEnabled}
+                onTogglePet={this.handleTogglePet}
                 canvas={this.canvas}
                 colorInfo={this.state.colorInfo}
                 dragRef={this.setDragCanvas}
                 question={this.state.question}
                 onDoubleClick={this.handleDoubleClick}
                 onQuestionAnswered={this.handleQuestionAnswered}
-                onFeedPet={this.handleFeedPet}
-                onPlayWithPet={this.handlePlayWithPet}
-                onCleanPet={this.handleCleanPet}
-                onSleepPet={this.handleSleepPet}
-                hunger={this.state.hunger}
-                cleanliness={this.state.cleanliness}
-                happiness={this.state.happiness}
-                energy={this.state.energy}
-                petReactionMessage={this.state.petReactionMessage}
-                petSpeechMessage={this.state.petSpeechMessage}
-                petSpeechVisible={this.state.petSpeechVisible}
-                petX={this.state.petX}
-                petY={this.state.petY}
-                foodItems={this.state.foodItems}
-                collectedFood={this.state.collectedFood}
-                onFoodClick={this.handleFoodClick}
-                wasteItems={this.state.wasteItems}
-                onWasteClick={this.handleWasteClick}
-                isSleeping={this.state.isSleeping}
-                sleepCountdown={this.state.sleepCountdown}
-                disableFeed={this.state.energy < 2}
-                disablePlay={this.state.energy < 10 || this.state.hunger > 80}
-                disableClean={this.state.energy < 10}
-                disableFood={false}
-                disableWaste={this.state.energy < 8}
-                disableSleep={false}
+                {...(petEnabled
+                    ? {
+                          onFeedPet: this.handleFeedPet,
+                          onPlayWithPet: this.handlePlayWithPet,
+                          onCleanPet: this.handleCleanPet,
+                          onSleepPet: this.handleSleepPet,
+                          hunger: this.state.hunger,
+                          cleanliness: this.state.cleanliness,
+                          happiness: this.state.happiness,
+                          energy: this.state.energy,
+                          petReactionMessage: this.state.petReactionMessage,
+                          petSpeechMessage: this.state.petSpeechMessage,
+                          petSpeechVisible: this.state.petSpeechVisible,
+                          petX: this.state.petX,
+                          petY: this.state.petY,
+                          foodItems: this.state.foodItems,
+                          collectedFood: this.state.collectedFood,
+                          onFoodClick: this.handleFoodClick,
+                          wasteItems: this.state.wasteItems,
+                          onWasteClick: this.handleWasteClick,
+                          isSleeping: this.state.isSleeping,
+                          sleepCountdown: this.state.sleepCountdown,
+                          disableFeed: this.state.energy < 2,
+                          disablePlay:
+                              this.state.energy < 10 || this.state.hunger > 80,
+                          disableClean: this.state.energy < 10,
+                          disableFood: false,
+                          disableWaste: this.state.energy < 8,
+                          disableSleep: false,
+                      }
+                    : {})}
                 {...props}
             />
         );
