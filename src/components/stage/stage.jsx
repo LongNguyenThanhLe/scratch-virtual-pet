@@ -11,6 +11,7 @@ import GreenFlagOverlay from "../../containers/green-flag-overlay.jsx";
 import Question from "../../containers/question.jsx";
 import MicIndicator from "../mic-indicator/mic-indicator.jsx";
 import ButtonComponent from "../button/button.jsx";
+import Switch from "../button/switch.jsx";
 import feedIcon from "./icon--feed.svg";
 import playIcon from "./icon--play.svg";
 import cleanIcon from "./icon--clean.svg";
@@ -60,6 +61,8 @@ const StageComponent = (props) => {
         disableFood,
         disableWaste,
         disableSleep,
+        petEnabled,
+        onTogglePet,
         ...boxProps
     } = props;
 
@@ -76,6 +79,22 @@ const StageComponent = (props) => {
                 })}
                 onDoubleClick={onDoubleClick}
             >
+                <div
+                    style={{
+                        position: "absolute",
+                        top: 10,
+                        left: 10,
+                        zIndex: 2000,
+                    }}
+                >
+                    <Switch
+                        checked={petEnabled}
+                        onChange={onTogglePet}
+                        label={
+                            petEnabled ? "Virtual Pet: ON" : "Virtual Pet: OFF"
+                        }
+                    />
+                </div>
                 <Box
                     className={classNames(styles.stage, {
                         [styles.fullScreen]: isFullScreen,
@@ -94,220 +113,236 @@ const StageComponent = (props) => {
                         {...boxProps}
                     />
 
-                    {/* Food Items */}
-                    {foodItems.map((food) => (
-                        <div
-                            key={food.id}
-                            className={
-                                styles.foodItem +
-                                (food.fading ? " " + styles.foodFading : "")
-                            }
-                            style={{
-                                position: "absolute",
-                                left: `${food.x}px`,
-                                top: `${food.y}px`,
-                                transform: "translate(-50%, -50%)",
-                                cursor:
-                                    isSleeping || disableFood
-                                        ? "not-allowed"
-                                        : "pointer",
-                                zIndex: 100,
-                                pointerEvents:
-                                    isSleeping || disableFood ? "none" : "auto",
-                            }}
-                            onClick={
-                                isSleeping || disableFood
-                                    ? undefined
-                                    : () => onFoodClick(food.id)
-                            }
-                        >
-                            <span className={styles.foodEmoji}>
-                                {foodEmojis[food.type]}
-                            </span>
-                        </div>
-                    ))}
+                    {/* Only render pet UI if enabled */}
+                    {petEnabled && (
+                        <>
+                            {/* Food Items */}
+                            {foodItems.map((food) => (
+                                <div
+                                    key={food.id}
+                                    className={
+                                        styles.foodItem +
+                                        (food.fading
+                                            ? " " + styles.foodFading
+                                            : "")
+                                    }
+                                    style={{
+                                        position: "absolute",
+                                        left: `${food.x}px`,
+                                        top: `${food.y}px`,
+                                        transform: "translate(-50%, -50%)",
+                                        cursor:
+                                            isSleeping || disableFood
+                                                ? "not-allowed"
+                                                : "pointer",
+                                        zIndex: 100,
+                                        pointerEvents:
+                                            isSleeping || disableFood
+                                                ? "none"
+                                                : "auto",
+                                    }}
+                                    onClick={
+                                        isSleeping || disableFood
+                                            ? undefined
+                                            : () => onFoodClick(food.id)
+                                    }
+                                >
+                                    <span className={styles.foodEmoji}>
+                                        {foodEmojis[food.type]}
+                                    </span>
+                                </div>
+                            ))}
 
-                    {/* Waste Items */}
-                    {wasteItems &&
-                        wasteItems.map((waste) => (
-                            <div
-                                key={waste.id}
-                                className={
-                                    styles.wasteItem +
-                                    (waste.fading
-                                        ? " " + styles.wasteFading
-                                        : "")
-                                }
-                                style={{
-                                    position: "absolute",
-                                    left: `${waste.x}px`,
-                                    top: `${waste.y}px`,
-                                    transform: "translate(-50%, -50%)",
-                                    cursor:
-                                        isSleeping || disableWaste
-                                            ? "not-allowed"
-                                            : "pointer",
-                                    zIndex: 101,
-                                    fontSize: "2.2rem",
-                                    pointerEvents:
-                                        isSleeping || disableWaste
-                                            ? "none"
-                                            : "auto",
-                                }}
-                                onClick={
-                                    isSleeping || disableWaste
-                                        ? undefined
-                                        : () => onWasteClick(waste.id)
-                                }
-                                title="Click to clean!"
-                            >
-                                <span role="img" aria-label="waste">
-                                    💩
-                                </span>
-                            </div>
-                        ))}
+                            {/* Waste Items */}
+                            {wasteItems &&
+                                wasteItems.map((waste) => (
+                                    <div
+                                        key={waste.id}
+                                        className={
+                                            styles.wasteItem +
+                                            (waste.fading
+                                                ? " " + styles.wasteFading
+                                                : "")
+                                        }
+                                        style={{
+                                            position: "absolute",
+                                            left: `${waste.x}px`,
+                                            top: `${waste.y}px`,
+                                            transform: "translate(-50%, -50%)",
+                                            cursor:
+                                                isSleeping || disableWaste
+                                                    ? "not-allowed"
+                                                    : "pointer",
+                                            zIndex: 101,
+                                            fontSize: "2.2rem",
+                                            pointerEvents:
+                                                isSleeping || disableWaste
+                                                    ? "none"
+                                                    : "auto",
+                                        }}
+                                        onClick={
+                                            isSleeping || disableWaste
+                                                ? undefined
+                                                : () => onWasteClick(waste.id)
+                                        }
+                                        title="Click to clean!"
+                                    >
+                                        <span role="img" aria-label="waste">
+                                            💩
+                                        </span>
+                                    </div>
+                                ))}
 
-                    {/* Pet Status Display */}
-                    <div className={styles.petStatusRow}>
-                        <div className={styles.petMetric}>
-                            <span className={styles.metricLabel}>Hunger:</span>
-                            <div className={styles.metricBarWrapper}>
-                                <div
-                                    className={styles.metricBar}
-                                    style={{
-                                        width: `${hunger}%`,
-                                        backgroundColor:
-                                            hunger > 70
-                                                ? "#ff6b6b"
-                                                : hunger > 40
-                                                ? "#ffa726"
-                                                : "#4caf50",
-                                    }}
-                                />
+                            {/* Pet Status Display */}
+                            <div className={styles.petStatusRow}>
+                                <div className={styles.petMetric}>
+                                    <span className={styles.metricLabel}>
+                                        Hunger:
+                                    </span>
+                                    <div className={styles.metricBarWrapper}>
+                                        <div
+                                            className={styles.metricBar}
+                                            style={{
+                                                width: `${hunger}%`,
+                                                backgroundColor:
+                                                    hunger > 70
+                                                        ? "#ff6b6b"
+                                                        : hunger > 40
+                                                        ? "#ffa726"
+                                                        : "#4caf50",
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <div className={styles.petMetric}>
+                                    <span className={styles.metricLabel}>
+                                        Cleanliness:
+                                    </span>
+                                    <div className={styles.metricBarWrapper}>
+                                        <div
+                                            className={styles.metricBar}
+                                            style={{
+                                                width: `${cleanliness}%`,
+                                                backgroundColor:
+                                                    cleanliness > 70
+                                                        ? "#4caf50"
+                                                        : cleanliness > 40
+                                                        ? "#ffa726"
+                                                        : "#ff6b6b",
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <div className={styles.petMetric}>
+                                    <span className={styles.metricLabel}>
+                                        Happiness:
+                                    </span>
+                                    <div className={styles.metricBarWrapper}>
+                                        <div
+                                            className={styles.metricBar}
+                                            style={{
+                                                width: `${happiness}%`,
+                                                backgroundColor:
+                                                    happiness > 70
+                                                        ? "#4caf50"
+                                                        : happiness > 40
+                                                        ? "#ffa726"
+                                                        : "#ff6b6b",
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <div className={styles.petMetric}>
+                                    <span className={styles.metricLabel}>
+                                        Energy:
+                                    </span>
+                                    <div className={styles.metricBarWrapper}>
+                                        <div
+                                            className={styles.metricBar}
+                                            style={{
+                                                width: `${energy}%`,
+                                                backgroundColor:
+                                                    energy > 70
+                                                        ? "#4caf50"
+                                                        : energy > 40
+                                                        ? "#ffa726"
+                                                        : "#ff6b6b",
+                                            }}
+                                        />
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div className={styles.petMetric}>
-                            <span className={styles.metricLabel}>
-                                Cleanliness:
-                            </span>
-                            <div className={styles.metricBarWrapper}>
-                                <div
-                                    className={styles.metricBar}
-                                    style={{
-                                        width: `${cleanliness}%`,
-                                        backgroundColor:
-                                            cleanliness > 70
-                                                ? "#4caf50"
-                                                : cleanliness > 40
-                                                ? "#ffa726"
-                                                : "#ff6b6b",
-                                    }}
-                                />
-                            </div>
-                        </div>
-                        <div className={styles.petMetric}>
-                            <span className={styles.metricLabel}>
-                                Happiness:
-                            </span>
-                            <div className={styles.metricBarWrapper}>
-                                <div
-                                    className={styles.metricBar}
-                                    style={{
-                                        width: `${happiness}%`,
-                                        backgroundColor:
-                                            happiness > 70
-                                                ? "#4caf50"
-                                                : happiness > 40
-                                                ? "#ffa726"
-                                                : "#ff6b6b",
-                                    }}
-                                />
-                            </div>
-                        </div>
-                        <div className={styles.petMetric}>
-                            <span className={styles.metricLabel}>Energy:</span>
-                            <div className={styles.metricBarWrapper}>
-                                <div
-                                    className={styles.metricBar}
-                                    style={{
-                                        width: `${energy}%`,
-                                        backgroundColor:
-                                            energy > 70
-                                                ? "#4caf50"
-                                                : energy > 40
-                                                ? "#ffa726"
-                                                : "#ff6b6b",
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    </div>
 
-                    {/* Pet Speech Bubble */}
-                    {petSpeechVisible && (
-                        <div
-                            className={styles.petSpeechBubble}
-                            style={{
-                                position: "absolute",
-                                left: `${petX}px`,
-                                top: `${petY - 60}px`,
-                                transform: "translateX(-50%)",
-                                zIndex: 1000,
-                            }}
-                        >
-                            {petSpeechMessage}
-                        </div>
-                    )}
-                    {/* Pet Reaction Message */}
-                    {petReactionMessage && (
-                        <div className={styles.petReactionMessage}>
-                            {petReactionMessage}
-                        </div>
-                    )}
-                    {/* Pet Interaction Buttons */}
-                    <div className={styles.petButtonRow}>
-                        <ButtonComponent
-                            iconSrc={feedIcon}
-                            onClick={onFeedPet}
-                            disabled={
-                                collectedFood <= 0 || isSleeping || disableFeed
-                            }
-                        >
-                            Feed ({collectedFood})
-                        </ButtonComponent>
-                        <ButtonComponent
-                            iconSrc={playIcon}
-                            onClick={onPlayWithPet}
-                            disabled={isSleeping || disablePlay}
-                        >
-                            Play
-                        </ButtonComponent>
-                        <ButtonComponent
-                            iconSrc={cleanIcon}
-                            onClick={onCleanPet}
-                            disabled={isSleeping || disableClean}
-                        >
-                            Clean
-                        </ButtonComponent>
-                        <ButtonComponent
-                            iconSrc={sleepIcon}
-                            onClick={onSleepPet}
-                            disabled={isSleeping || disableSleep}
-                        >
-                            Sleep
-                        </ButtonComponent>
-                    </div>
-                    {isSleeping && (
-                        <div className={styles.sleepOverlay}>
-                            <span role="img" aria-label="sleeping">
-                                😴
-                            </span>{" "}
-                            Sleeping... Please wait
-                            <div className={styles.sleepCountdown}>
-                                ({sleepCountdown})
+                            {/* Pet Speech Bubble */}
+                            {petSpeechVisible && (
+                                <div
+                                    className={styles.petSpeechBubble}
+                                    style={{
+                                        position: "absolute",
+                                        left: `${petX}px`,
+                                        top: `${petY - 60}px`,
+                                        transform: "translateX(-50%)",
+                                        zIndex: 1000,
+                                    }}
+                                >
+                                    {petSpeechMessage}
+                                </div>
+                            )}
+                            {/* Pet Reaction Message */}
+                            {petReactionMessage && (
+                                <div className={styles.petReactionMessage}>
+                                    {petReactionMessage}
+                                </div>
+                            )}
+                            {/* Pet Interaction Buttons */}
+                            <div className={styles.petButtonRow}>
+                                <ButtonComponent
+                                    iconSrc={feedIcon}
+                                    onClick={onFeedPet}
+                                    disabled={
+                                        collectedFood <= 0 ||
+                                        isSleeping ||
+                                        disableFeed
+                                    }
+                                >
+                                    Feed ({collectedFood})
+                                </ButtonComponent>
+                                <ButtonComponent
+                                    iconSrc={playIcon}
+                                    onClick={onPlayWithPet}
+                                    disabled={isSleeping || disablePlay}
+                                >
+                                    Play
+                                </ButtonComponent>
+                                <ButtonComponent
+                                    iconSrc={cleanIcon}
+                                    onClick={onCleanPet}
+                                    disabled={isSleeping || disableClean}
+                                >
+                                    Clean
+                                </ButtonComponent>
+                                <ButtonComponent
+                                    iconSrc={sleepIcon}
+                                    onClick={onSleepPet}
+                                    disabled={isSleeping || disableSleep}
+                                >
+                                    Sleep
+                                </ButtonComponent>
                             </div>
-                        </div>
+                            {isSleeping && (
+                                <div className={styles.sleepOverlay}>
+                                    <span role="img" aria-label="sleeping">
+                                        😴
+                                    </span>{" "}
+                                    Sleeping... Please wait
+                                    <div className={styles.sleepCountdown}>
+                                        ({sleepCountdown})
+                                    </div>
+                                </div>
+                            )}
+                        </>
                     )}
+
                     <Box className={styles.monitorWrapper}>
                         <MonitorList
                             draggable={useEditorDragStyle}
@@ -420,6 +455,8 @@ StageComponent.propTypes = {
     disableFood: PropTypes.bool,
     disableWaste: PropTypes.bool,
     disableSleep: PropTypes.bool,
+    petEnabled: PropTypes.bool,
+    onTogglePet: PropTypes.func,
 };
 StageComponent.defaultProps = {
     dragRef: () => {},
