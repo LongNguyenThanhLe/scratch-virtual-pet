@@ -111,6 +111,8 @@ class Stage extends React.Component {
             "targetsUpdate",
             this.handleTargetsUpdate
         );
+        // Regularly check pet needs for speech bubble
+        this.petNeedsInterval = setInterval(this.checkPetNeeds, 2000);
         if (this.state.petEnabled) {
             this.startPetIntervals();
         }
@@ -170,6 +172,7 @@ class Stage extends React.Component {
             "targetsUpdate",
             this.handleTargetsUpdate
         );
+        clearInterval(this.petNeedsInterval);
         this.clearPetIntervals();
     }
     questionListener(question) {
