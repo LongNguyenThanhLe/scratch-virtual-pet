@@ -279,8 +279,8 @@ const StageComponent = (props) => {
                                     className={styles.petSpeechBubble}
                                     style={{
                                         position: "absolute",
-                                        left: `${petX}px`,
-                                        top: `${petY - 60}px`,
+                                        left: "50%",
+                                        bottom: "6rem",
                                         transform: "translateX(-50%)",
                                         zIndex: 1000,
                                     }}
