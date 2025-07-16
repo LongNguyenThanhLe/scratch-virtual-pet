@@ -184,16 +184,27 @@ class Stage extends React.Component {
         });
     }
     handleTargetsUpdate() {
-        // Get the pet sprite's current position
+        this.updateRect();
         const targets = this.props.vm.runtime.targets;
-        const petTarget = targets.find(
-            (target) =>
-                (target.name && target.name.toLowerCase().includes("pet")) ||
-                target.id === this.props.vm.editingTarget
-        );
-
+        let petTarget = null;
+        // If dragging, use the dragged sprite
+        if (this.state.isDragging && this.state.dragId) {
+            petTarget = targets.find(
+                (target) => target.id === this.state.dragId
+            );
+        }
+        // Otherwise, use the currently editing target if it's a sprite
+        if (!petTarget) {
+            petTarget = targets.find(
+                (target) =>
+                    target.id === this.props.vm.editingTarget && !target.isStage
+            );
+        }
+        // Fallback: first non-stage target
+        if (!petTarget) {
+            petTarget = targets.find((target) => !target.isStage);
+        }
         if (petTarget) {
-            // Convert Scratch coordinates to screen coordinates for the speech bubble
             const nativeSize = this.renderer.getNativeSize();
             const screenX =
                 (petTarget.x / nativeSize[0]) * this.rect.width +
@@ -201,13 +212,7 @@ class Stage extends React.Component {
             const screenY =
                 -(petTarget.y / nativeSize[1]) * this.rect.height +
                 this.rect.height / 2;
-
-            this.setState({
-                petX: screenX,
-                petY: screenY,
-            });
-
-            // Also affect pet stats when it moves (from Scratch blocks)
+            this.setState({ petX: screenX, petY: screenY });
             this.setState((prevState) => ({
                 energy: Math.max(0, prevState.energy - Math.random() * 2),
                 cleanliness: Math.max(
