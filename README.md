@@ -50,6 +50,8 @@ Welcome to the virtual pet simulator! Below are the gameplay mechanics, rules, a
   - Cleanliness: -10  
 - **Reaction**: _"Yay! That was fun! 😺🎉"_
 
+Update: user can play with pet by interacting with motion, sound, look: move 10 steps,.... it also increases happy.
+
 ---
 
 ### 🛁 Clean Pet  
